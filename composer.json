@@ -1,0 +1,26 @@
+{
+  "name": "laocc/helper",
+  "description": "php functions helper",
+  "homepage": "https://github.com/laocc/helper",
+  "authors": [
+    {
+      "name": "fazo",
+      "email": "fazo@qq.com"
+    }
+  ],
+  "require": {
+    "php": ">7.0",
+    "ext-json": "*"
+  },
+  "autoload": {
+    "files": [
+      "function/judge.php",
+      "function/other.php",
+      "function/rely.php",
+      "function/time.php",
+      "function/tools.php"
+    ],
+    "psr-4": {
+    }
+  }
+}
