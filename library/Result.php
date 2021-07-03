@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace esp\library;
 
+use esp\core\ext\Paging;
+
 /**
  * ajax/post中返回数据的封装
  *
@@ -147,8 +149,8 @@ class Result
         ];
         $value['_sign'] = md5(json_encode($value, 256 | 64) . $this->_token);
 
-        if (!is_null($this->_paging)) $value['paging'] = $this->_paging->value();
-        else if (!is_null($this->_pageValue)) $value['paging'] = $this->_pageValue;
+        if (!is_null($this->_pageValue)) $value['paging'] = $this->_pageValue;
+        else if (!is_null($this->_paging)) $value['paging'] = $this->_paging->value();
 
         if (!empty($this->_append)) $value += $this->_append;
 
