@@ -502,3 +502,21 @@ function _echo($text, string $bgColor = null, string $ftColor = null)
     echo chr(27) . $color . $text . chr(27) . "[0m\n";
 }
 
+/**
+ * 将js中object格式的json转换为PHP能接受的json格式
+ *
+ * 例如：{a:123,b:'string'}
+ * 转为：{"a":123,"b":"string"}
+ *
+ * 也就是将键名加双引号，值若是单引号的也改为双引号
+ *
+ * @param string $jsObject
+ * @return null|string|string[]
+ */
+function object_json(string $jsObject)
+{
+    return preg_replace(
+        ["/([a-zA-Z_]+[a-zA-Z0-9_]*)\s*:/", "/:\s*'(.*?)'/"],
+        ['"\1":', ': "\1"'],
+        $jsObject);
+}

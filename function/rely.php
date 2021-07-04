@@ -85,10 +85,27 @@ function root(string $path, bool $real = false): string
     return rtrim($path, '/');
 }
 
+/**
+ * 储存文件
+ * @param string $file
+ * @param string $content
+ * @param bool $append
+ * @param array $trace
+ * @return int
+ */
+function save_file(string $file, $content, bool $append = false, array $trace = null): int
+{
+    if (is_null($trace)) $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
+    mk_dir($file, 0740, $trace);
+    if (is_array($content)) $content = json_encode($content, 256 | 64);
+    return file_put_contents($file, $content, $append ? FILE_APPEND : LOCK_EX);
+}
+
 
 /**
  * @param string $path 若不是以/结尾，则会向上缩一级
  * @param int $mode
+ * @param array $trace
  * @return bool
  * 文件权限：
  * 类型   所有者  所有者组    其它用户
@@ -97,12 +114,24 @@ function root(string $path, bool $real = false): string
  * x    exec    1
  * 通过PHP建立的文件夹权限一般为0740就可以了
  */
-function mk_dir(string $path, int $mode = 0740): bool
+function mk_dir(string $path, int $mode = 0740, array $trace = null): bool
 {
     if (!$path) return false;
-    if (strrchr($path, '/') !== '/') $path = dirname($path);
+    $check = strrchr($path, '/');
+
+    if ($check === false) {
+        if (is_null($trace)) $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
+        $file = $trace['file'] ?? '';
+        $line = $trace['line'] ?? 0;
+
+        throw new \ErrorException("目录或文件名中必须要含有/号，当前path=" . var_export($path, true),
+            500, 1, $file, $line);
+    }
+
+    if ($check !== '/') $path = dirname($path);
+
     try {
-        if (!is_dir($path)) {
+        if (!file_exists($path) or !is_dir($path)) {
             @mkdir($path, $mode ?: 0740, true);
         }
         return true;
@@ -199,20 +228,6 @@ function replace_array(string $str, array $arr): string
     }, array_keys($arr)), array_values($arr), $str);
 }
 
-
-/**
- * 储存文件
- * @param string $file
- * @param string $content
- * @param bool $append
- * @return int
- */
-function save_file(string $file, string $content, bool $append = false): int
-{
-    if (is_array($content)) $content = json_encode($content, 256 | 64);
-    mk_dir($file);
-    return file_put_contents($file, $content, $append ? FILE_APPEND : LOCK_EX);
-}
 
 /**
  * 从arr内取出相关的字段组成一个新的数组

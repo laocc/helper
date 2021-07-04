@@ -97,7 +97,7 @@ function is_cen($value): bool
 }
 
 /**
- * 是否整形，含纯字串的数字也视作整型，如果单纯只判断是否===整型，直接用is_int
+ * 是否符合整形值，含纯字串的数字也视作整型，如果单纯只判断是否===整型，直接用is_int
  * @param $value
  * @return bool
  */
@@ -170,6 +170,11 @@ function is_time($value): bool
     return (boolean)preg_match('/^([0-1]\d|2[0-3])(\:[0-5]\d){2}$/', $value);
 }
 
+/**
+ * 是否json格式
+ * @param $value
+ * @return bool
+ */
 function is_json($value): bool
 {
     if (empty($value) or !is_string($value)) return false;
