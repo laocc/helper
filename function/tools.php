@@ -3,6 +3,90 @@
 namespace esp\helper;
 
 /**
+ * 显示某个错误状态信息
+ *
+ * @param int $code
+ * @param bool $writeHeader
+ * @return string
+ */
+function displayState(int $code, bool $writeHeader = true): string
+{
+    $conf = [
+        100 => 'Continue',
+        101 => 'Switching Protocols',
+        200 => 'OK',
+        201 => 'Created',
+        202 => 'Accepted',
+        203 => 'Non-Authoritative Information',
+        204 => 'No Content',
+        205 => 'Reset Content',
+        206 => 'Partial Content',
+        300 => 'Multiple Choices',
+        301 => 'Moved Permanently',
+        302 => 'Found',
+        303 => 'See Other',
+        304 => 'Not Modified',
+        305 => 'Use Proxy',
+        306 => '(Unused)',
+        307 => 'Temporary Redirect',
+        400 => 'Bad Request',
+        401 => 'Unauthorized',
+        402 => 'Payment Required',
+        403 => 'Forbidden',
+        404 => 'Not Found',
+        405 => 'Method Not Allowed',
+        406 => 'Not Acceptable',
+        407 => 'Proxy Authentication Required',
+        408 => 'Request Timeout',
+        409 => 'Conflict',
+        410 => 'Gone',
+        411 => 'Length Required',
+        412 => 'Precondition Failed',
+        413 => 'Request Entity Too Large',
+        414 => 'Request-URI Too Long',
+        415 => 'Unsupported Media Type',
+        416 => 'Requested Range Not Satisfiable',
+        417 => 'Expectation Failed',
+        500 => 'Internal Server Error',
+        501 => 'Not Implemented',
+        502 => 'Bad Gateway',
+        503 => 'Service Unavailable',
+        504 => 'Gateway Timeout',
+        505 => 'HTTP Version Not Supported',
+    ];
+    $state = $conf[$code] ?? 'OK';
+    if (_CLI) return "[{$code}]:{$state}\n";
+    $server = isset($_SERVER['SERVER_SOFTWARE']) ? ucfirst($_SERVER['SERVER_SOFTWARE']) : null;
+    $html = <<<HTML
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head>
+        <meta charset="UTF-8">
+        <title>{$code} {$state}</title>
+        <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1">
+    </head>
+    <body bgcolor="white">
+        <center><h1>{$code} {$state}</h1></center>
+        <hr>
+        <center>{$server}</center>
+    </body>
+</html>
+HTML;
+    if ($writeHeader) {
+        http_response_code($code);
+        if (!stripos(PHP_SAPI, 'cgi')) {
+            header("Status: {$code} {$state}", true);
+        } else {
+            $protocol = $_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.1';
+            header("{$protocol} {$code} {$state}", true, $code);
+        }
+        header('Content-type: text/html', true);
+    }
+    return $html;
+}
+
+
+/**
  * 读取CPU数量信息
  * @return array
  */
