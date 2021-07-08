@@ -290,24 +290,21 @@ final class Upload
      * @param $ext
      * @return array
      */
-    private function filename($ext)
+    private function filename(string $ext): array
     {
         $option = $this->option;
         $ext = trim(strtolower($ext), '.');
 
-        $root = \esp\helper\root(rtrim($option['save']['root'], '/') . '/');
-
         $folder = trim($option['save']['folder'] ?: '%D', '/') . '/';
         $folder = \esp\helper\format($folder);
+        $root = \esp\helper\root(rtrim($option['save']['root'], '/') . '/');
         $name = \esp\helper\format($option['save']['name'] ?: '%u');
-        $name = strtolower($name);
-
         $path = $root . $folder . $name . ($ext ? ".{$ext}" : '');
-        \esp\helper\mk_dir($path);
 
-        if (is_file(realpath($path))) {
-            return $this->filename($ext);
-        }
+        //若文件名已存在，重新生成一个
+        if (is_file($path)) return $this->filename($ext);
+
+        \esp\helper\mk_dir($path);
         return [
             'root' => $root,
             'folder' => $folder,

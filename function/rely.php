@@ -70,18 +70,19 @@ function load(string $file)
 /**
  * 修正为_ROOT开头
  * @param string $path
- * @param bool $real
+ * @param bool $real 检查文件或目录是否存在
  * @return string
  */
 function root(string $path, bool $real = false): string
 {
-    foreach (['home', 'mnt', 'mdb', 'mda'] as $r) {
+    foreach (['home', 'mnt', 'mdb', 'mda', 'tmp'] as $r) {
         if (stripos($path, "/{$r}/") === 0) goto end;
     }
 
     if (stripos($path, _ROOT) !== 0) $path = _ROOT . "/" . trim($path, '/');
     end:
     if ($real) $path = realpath($path);
+    if ($path === false) return '';
     return rtrim($path, '/');
 }
 
