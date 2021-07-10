@@ -123,8 +123,9 @@ abstract class Request
         ksort($data);
         $str = '';
         foreach ($data as $k => $v) {
-            if ($v === '') continue;
-            if (is_array($v)) $v = json_encode($v, 256 | 64);
+            if ($v === '' or is_null($v)) continue;
+            if (is_bool($v)) $v = intval($v);
+            else if (is_array($v)) $v = json_encode($v, 256 | 64);
             $str .= "{$k}={$v}&";
         }
         $md5 = md5("{$str}{$tKey}={$token}");

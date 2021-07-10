@@ -87,6 +87,46 @@ HTML;
 
 
 /**
+ *
+ * 配合Debug，将Transfer日志移到最终位置
+ *
+ * @param bool $show
+ * @param string|null $path
+ */
+function moveTransfer(string $path, bool $show = true)
+{
+    if (!_CLI) throw new \Error('moveTransfer只能运行于CLI环境');
+    $time = 0;
+    reMove:
+    $time++;
+    $dir = new \DirectoryIterator($path);
+    $array = array();
+    foreach ($dir as $i => $f) {
+        if ($i > 100) break;
+        if ($f->isFile()) $array[] = $f->getFilename();
+    }
+    if (empty($array)) return;
+
+    if ($show) echo date('Y-m-d H:i:s') . "\tmoveTransfer({$time}):\t" . json_encode($array, 256 | 64) . "\n";
+
+    foreach ($array as $file) {
+        try {
+            $move = base64_decode(urldecode($file));
+            if (empty($move) or $move[0] !== '/') {
+                @unlink("{$path}/{$file}");
+                continue;
+            }
+            mk_dir($move);
+            rename("{$path}/{$file}", $move);
+        } catch (\Error $e) {
+            print_r(['moveTransfer' => $e]);
+        }
+    }
+    goto reMove;
+}
+
+
+/**
  * 读取CPU数量信息
  * @return array
  */
