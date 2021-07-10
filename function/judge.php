@@ -103,9 +103,10 @@ function is_cen($value): bool
  */
 function is_integers($value): bool
 {
-    if (!is_scalar($value) || is_bool($value) || \is_float($value + 0)) return false;
-    if (($value + 0) > PHP_INT_MAX) return false;
-    return (bool)preg_match('/^(\+|\-)?\d+$/', $value);
+    if (!is_scalar($value) || is_bool($value) || is_array($value) || is_null($value)) return false;
+    if (!(bool)preg_match('/^[+-]?\d+$/', strval($value))) return false;
+    if (intval($value) > PHP_INT_MAX) return false;
+    return true;
 }
 
 /**
