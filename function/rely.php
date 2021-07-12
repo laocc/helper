@@ -104,18 +104,23 @@ function save_file(string $file, $content, bool $append = false, array $trace = 
 
 
 /**
- * @param string $path 若不是以/结尾，则会向上缩一级
- * @param int $mode
- * @param array $trace
- * @return bool
- * 文件权限：
- * 类型   所有者  所有者组    其它用户
+ * 文件权限： 所有者  所有者组    其它用户
+ *
  * r    read    4
  * w    write   2
  * x    exec    1
- * 通过PHP建立的文件夹权限一般为0740就可以了
+ *
+ * 通过PHP建立的文件夹权限一般为0744就可以了
+ *
+ * 若php-fpm由www账号运行，且目录有可能需要写入，则需要将此目录改为0777，或chown为www账号
+ *
+ * @param string $path 若不是以/结尾，则会向上缩一级
+ * @param int $mode
+ * @param array|null $trace
+ * @return bool
+ * @throws \ErrorException
  */
-function mk_dir(string $path, int $mode = 0740, array $trace = null): bool
+function mk_dir(string $path, int $mode = 0744, array $trace = null): bool
 {
     if (!$path) return false;
     $check = strrchr($path, '/');
@@ -132,9 +137,7 @@ function mk_dir(string $path, int $mode = 0740, array $trace = null): bool
     if ($check !== '/') $path = dirname($path);
 
     try {
-        if (!file_exists($path) or !is_dir($path)) {
-            @mkdir($path, $mode ?: 0740, true);
-        }
+        if (!file_exists($path)) @mkdir($path, $mode ?: 0740, true);
         return true;
     } catch (\Error $e) {
         return false;
