@@ -136,7 +136,7 @@ function get_cpu()
     $str = file_get_contents("/proc/cpuinfo");
     if (!$str) return ['number' => 0, 'name' => 'null'];
     $cpu = [];
-    if (preg_match_all("/model\s+name\s{0,}\:+\s{0,}([\w\s\)\(\@.-]+)([\r\n]+)/s", $str, $model)) {
+    if (preg_match_all("/model\s+name\s{0,}\:+\s{0,}([\w\s\(\)\@.-]+)([\r\n]+)/s", $str, $model)) {
         $cpu['number'] = count($model[1]);
         $cpu['name'] = $model[1][0];
     }
@@ -508,7 +508,8 @@ function replace_for_split(string $str, string $f = ','): string
 }
 
 /**
- * 计算一个数的组成，比如：10=8+2，14=8+4+2，22=16+4+2。
+ * 计算一个2倍等比数列组成，
+ * 比如：10=8+2，14=8+4+2，22=16+4+2。
  * @param $num
  * @return array
  */
@@ -520,6 +521,24 @@ function numbers(int $num): array
         ($i & $num) && ($val[] = $i) && ($num -= $i);
     } while ($num > 0 && $i <<= 1);
     return $val;
+}
+
+
+/**
+ * 计算两组2倍等比数列中，前数有几个数在后数中
+ * 如：
+ * $value=13    = 1+4+8
+ * $number=7    = 1+2+4
+ * 则前数有2个值在后数中
+ *
+ * @param int $value
+ * @param int $number
+ * @param int $i
+ * @return bool
+ */
+function xor_number(int $value, int $number, int $i = 1): bool
+{
+    return count(array_intersect(numbers($value), numbers($number))) === $i;
 }
 
 
