@@ -13,11 +13,14 @@ function host(string $domain, string $branch = null): string
 {
     if (empty($domain)) return '';
     if (strpos($domain, '/')) $domain = explode('/', "{$domain}//")[2];
-    $dm = 'com|net|org|gov|idv|co|name';
-    if (!is_null($branch)) $dm .= '|' . trim(str_replace(',', '|', $branch), '|');
-    $p1 = "/^(?:[\w\.\-]+\.)?([a-z]+)\.({$dm})\.(cn|cm|my|ph|tw|uk|hk)$/i";
+    if (stripos($domain, $branch)) {
+        $bv = str_replace(',', '\.', $branch);
+        $p2 = "/^(?:[\w\.\-]+\.)?([a-z0-9]+)\.{$bv}$/i";
+        preg_match($p2, $domain, $match);
+        return "{$match[1]}.{$branch}";
+    }
+    $p1 = "/^(?:[\w\.\-]+\.)?([a-z]+)\.(com|net|org|gov|idv|co|name)\.(cn|cm|my|ph|tw|uk|hk)$/i";
     $p2 = "/^(?:[\w\.\-]+\.)?([a-z0-9]+)\.([a-z]+)$/i";
-
     if (preg_match($p1, $domain, $match)) {
         return "{$match[1]}.{$match[2]}.{$match[3]}";
 
@@ -27,7 +30,6 @@ function host(string $domain, string $branch = null): string
 
     return '';
 }
-
 /**
  * 提取URL中的域名
  * @param $url
