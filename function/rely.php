@@ -4,26 +4,28 @@ namespace esp\helper;
 
 /**
  * 查询域名的根域名，兼容国别的二级域名
- * @param $domain
+ * @param string $domain
+ * @param string $branch
+ * $branch为多选项，为：domain|myhost形式，将接到$dm后作为正则的一部分，也就是这个域名返回3节作为host
  * @return string
  */
-function host(string $domain): string
+function host(string $domain, string $branch = null): string
 {
     if (empty($domain)) return '';
-    $dm1 = 'cn|cm|my|ph|tw|uk|hk';
-    $dm2 = 'com|net|org|gov|idv|co|name';
-    if (strpos($domain, '/')) {
-        $domain = explode('/', "{$domain}//")[2];
-    }
-    if (preg_match("/^(?:[\w\.\-]+\.)?([a-z]+)\.({$dm2})\.({$dm1})$/i", $domain, $match)) {
+    if (strpos($domain, '/')) $domain = explode('/', "{$domain}//")[2];
+    $dm = 'com|net|org|gov|idv|co|name';
+    if (!is_null($branch)) $dm .= '|' . trim(str_replace(',', '|', $branch), '|');
+    $p1 = "/^(?:[\w\.\-]+\.)?([a-z]+)\.({$dm})\.(cn|cm|my|ph|tw|uk|hk)$/i";
+    $p2 = "/^(?:[\w\.\-]+\.)?([a-z0-9]+)\.([a-z]+)$/i";
+
+    if (preg_match($p1, $domain, $match)) {
         return "{$match[1]}.{$match[2]}.{$match[3]}";
 
-    } elseif (preg_match("/^(?:[\w\.\-]+\.)?([a-z0-9]+)\.([a-z]+)$/i", $domain, $match)) {
+    } elseif (preg_match($p2, $domain, $match)) {
         return "{$match[1]}.{$match[2]}";
-
-    } else {
-        return '';
     }
+
+    return '';
 }
 
 /**
