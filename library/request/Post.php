@@ -70,6 +70,8 @@ final class Post extends Request
                 return is_date($value);
             case 'time':
                 return is_time($value);
+            case 'domain':
+                return is_domain($value);
             case 'datetime':
                 return strtotime($value);
             case 'cn':
@@ -146,6 +148,9 @@ final class Post extends Request
                     break;
                 case 'card':
                     $this->recodeError($key, "必须为符合规则的身份证号码");
+                    break;
+                case 'domain':
+                    $this->recodeError($key, "必须为域名格式");
                     break;
                 case 'url':
                     $this->recodeError($key, "必须为URL格式");
