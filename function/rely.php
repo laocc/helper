@@ -6,14 +6,19 @@ namespace esp\helper;
  * 查询域名的根域名，兼容国别的二级域名
  * @param string $domain
  * @param string $branch
- * $branch为多选项，为：domain|myhost形式，将接到$dm后作为正则的一部分，也就是这个域名返回3节作为host
+ *
+ * $branch附加项，例如某项目，
+ * 需要将 www.admin.pay.domain.com 作为运行域名，
+ * 而这时希望将 pay.domain.com 作为host
+ * 这时需要在$branch中传入domain.com
+ * 
  * @return string
  */
 function host(string $domain, string $branch = null): string
 {
     if (empty($domain)) return '';
     if (strpos($domain, '/')) $domain = explode('/', "{$domain}//")[2];
-    if (stripos($domain, $branch)) {
+    if (is_string($branch) and stripos($domain, $branch)) {
         $bv = str_replace(',', '\.', $branch);
         $p2 = "/^(?:[\w\.\-]+\.)?([a-z0-9]+)\.{$bv}$/i";
         preg_match($p2, $domain, $match);
