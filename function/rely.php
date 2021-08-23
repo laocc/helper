@@ -6,12 +6,6 @@ namespace esp\helper;
  * 查询域名的根域名，兼容国别的二级域名
  * @param string $domain
  * @param string $branch
- *
- * $branch附加项，例如某项目，
- * 需要将 www.admin.pay.domain.com 作为运行域名，
- * 而这时希望将 pay.domain.com 作为host
- * 这时需要在$branch中传入domain.com
- * 
  * @return string
  */
 function host(string $domain, string $branch = null): string
