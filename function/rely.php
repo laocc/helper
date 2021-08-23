@@ -30,6 +30,7 @@ function host(string $domain, string $branch = null): string
 
     return '';
 }
+
 /**
  * 提取URL中的域名
  * @param $url
