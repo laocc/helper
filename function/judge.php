@@ -235,10 +235,22 @@ function is_ip(string $value, string $which = 'ipv4'): bool
     return (bool)filter_var($value, FILTER_VALIDATE_IP, $which);
 }
 
+/**
+ * 英文域名规则判断
+ *
+ * 1，总长3-255字符
+ * 2，每一节开头只能是a-z0-9
+ * 3，每一节只能是[a-z0-9][a-z0-9-]{0,62}\.且最少有一节
+ * 4，每一节含.号最长64字符
+ * 5，最后一节只能是a-z且2-10字符
+ *
+ * @param $value
+ * @return bool
+ */
 function is_domain($value): bool
 {
     if (empty($value) or !is_string($value)) return false;
-    return (boolean)preg_match('/^[a-z0-9](([a-z0-9-]){1,62}\.)+[a-z]{2,20}$/i', $value);
+    return (boolean)preg_match('/^(?=^.{3,255}$)([a-z0-9][a-z0-9-]{0,62}\.)+[a-z]{2,10}$/i', $value);
 }
 
 /**
