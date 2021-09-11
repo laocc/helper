@@ -26,9 +26,10 @@ final class Jump
 
     public function encode(int $userID, string $userName, $extend = ''): string
     {
-        if (!$extend) $extend = _TIME;
+        $time = time();
+        if (!$extend) $extend = $time;
         $extend = serialize($extend);
-        $sign = md5(date('YmdHi', _TIME) . $userID . $this->token . $userName . $extend);
+        $sign = md5(date('YmdHi', $time) . $userID . $this->token . $userName . $extend);
         $data = [
             'u' => $userID,
             'n' => $userName,
@@ -48,7 +49,7 @@ final class Jump
         $data = json_decode($json, true);
         if (!$data) return [];
         if (!isset($data['u']) or !isset($data['n']) or !isset($data['s'])) return [];
-        $time = _TIME;
+        $time = time();
         $sign = md5(date('YmdHi', $time) . $data['u'] . $this->token . $data['n'] . ($data['e'] ?? ''));
         if ($sign !== $data['s']) {
             $sign = md5(date('YmdHi', $time - 1) . $data['u'] . $this->token . $data['n'] . ($data['e'] ?? ''));
