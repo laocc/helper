@@ -8,16 +8,21 @@ namespace esp\helper;
  * @param string $branch
  * @return string
  */
-function host(string $domain, string $branch = null): string
+function host(string $domain, $branch = null): string
 {
     if (empty($domain)) return '';
     if (strpos($domain, '/')) $domain = explode('/', "{$domain}//")[2];
-    if (is_string($branch) and stripos($domain, $branch)) {
-        $bv = str_replace(',', '\.', $branch);
-        $p2 = "/^(?:[\w\.\-]+\.)?([a-z0-9]+)\.{$bv}$/i";
-        preg_match($p2, $domain, $match);
-        return "{$match[1]}.{$branch}";
+    if (!is_null($branch)) {
+        if (is_string($branch)) $branch = explode(',', str_replace(';', ',', $branch));
+        foreach ($branch as $bch) {
+            if (stripos($domain, $bch)) {
+                $bv = str_replace('.', '\.', $bch);
+                $p2 = "/^(?:[\w\.\-]+\.)?([a-z0-9]+)\.({$bv})$/i";
+                if (preg_match($p2, $domain, $match)) return "{$match[1]}.{$match[2]}";
+            }
+        }
     }
+
     $p1 = "/^(?:[\w\.\-]+\.)?([a-z]+)\.(com|net|org|gov|idv|co|name)\.(cn|cm|my|ph|tw|uk|hk)$/i";
     $p2 = "/^(?:[\w\.\-]+\.)?([a-z0-9]+)\.([a-z]+)$/i";
     if (preg_match($p1, $domain, $match)) {
