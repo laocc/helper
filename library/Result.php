@@ -9,7 +9,7 @@ use esp\core\ext\Paging;
  * ajax/post中返回数据的封装
  *
  * Class Result
- * @package esp\library
+ * @package esp\helper\library
  */
 class Result
 {

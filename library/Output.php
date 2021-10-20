@@ -11,7 +11,7 @@ use function esp\helper\text;
  * https://github.com/laocc/http
  *
  * Class Output
- * @package esp\library
+ * @package esp\helper\library
  */
 final class Output
 {

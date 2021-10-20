@@ -2,6 +2,8 @@
 
 namespace esp\helper;
 
+use esp\error\EspError;
+
 /**
  * 查询域名的根域名，兼容国别的二级域名
  * @param string $domain
@@ -178,10 +180,11 @@ function xml_decode(string $str, bool $toArray = true)
  * @param array $array
  * @param bool $outHead
  * @return string
+ * @throws EspError
  */
 function xml_encode($root, array $array, bool $outHead = true)
 {
-    return (new \esp\library\ext\Xml($array, $root))->render($outHead);
+    return (new \esp\helper\library\ext\Xml($array, $root))->render($outHead);
 }
 
 

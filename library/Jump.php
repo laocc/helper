@@ -5,7 +5,7 @@ namespace esp\helper\library;
 
 /**
  * Class Jump
- * @package esp\library
+ * @package esp\helper\library
  *
  * 两个系统后台相互跳
  * 条件：
