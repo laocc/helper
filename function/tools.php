@@ -475,17 +475,16 @@ function safe_replace(string $str): string
  * 2:227,128,128,
  * 3:9,
  * 4:32,
- * @param $html
- * @param int $star
- * @param int $stop
+ * @param string $html
+ * @param int|null $star
+ * @param int|null $stop
  * @return string
- * strip_tags
  */
 function text(string $html, int $star = null, int $stop = null): string
 {
     if ($stop === null) list($star, $stop) = [0, $star];
-    $v = preg_replace(['/\&lt\;(.*?)\&gt\;/is', '/&[a-z]+?\;/', '/<(.*?)>/is', '/[\s\x20\xa\xd\'\"\`]/is'], '', trim($html));
-    $v = str_ireplace(["\a", "\b", "\f", "\s", "\t", "\n", "\r", "\v", "\0", "\h", '  ', " ", "　", "	", ' '], '', $v);
+    $v = preg_replace(['/\&lt\;(.*?)\&gt\;/is', '/&[a-z]+?\;/i', '/<(.*?)>/is', '/[\s\x20\xa\xd\'\"\`]/is'], '', trim($html));
+    $v = str_ireplace(["\a", "\b", "\f", "\s", "\t", "\n", "\r", "\v", "\0", "\h", '  ', " ", "", "　", "	", ' '], '', $v);
     return htmlentities(mb_substr($v, $star, $stop, 'utf-8'));
 }
 
@@ -499,7 +498,7 @@ function replace_for_split(string $str, string $f = ','): string
 {
     if (empty($str)) return '';
     $str = mb_ereg_replace(
-        implode(['  ', " ", "　", "	", ' ']) .//这几个是特殊的空格
+        implode(['  ', " ", "", "　", "	", ' ']) .//这几个是特殊的空格
         '[\`\-\=\[\]\\\;\',\.\/\~\!\@\#\$\%\^\&\*\(\)\_\+\{\}\|\:\"\<\>\?\·【】、；‘，。/~！@#￥%……&*（）——+{}|：“《》？]',
         $f, $str);
     if (empty($f)) return $str;
