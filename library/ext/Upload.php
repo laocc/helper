@@ -1,6 +1,6 @@
 <?php
 
-namespace esp\library\ext;
+namespace esp\helper\library\ext;
 
 /*
  *
@@ -31,7 +31,7 @@ namespace esp\library\ext;
 
 */
 
-use esp\library\gd\Image;
+use esp\helper\library\gd\Image;
 
 final class Upload
 {

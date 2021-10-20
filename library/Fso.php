@@ -1,6 +1,6 @@
 <?php
 
-namespace esp\library;
+namespace esp\helper\library;
 
 
 class Fso

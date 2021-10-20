@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace esp\library\request;
+namespace esp\helper\library\request;
 
 use esp\error\EspError;
-use esp\library\ext\Xss;
+use esp\helper\library\ext\Xss;
 use function esp\helper\is_card;
 use function esp\helper\is_date;
 use function esp\helper\is_domain;

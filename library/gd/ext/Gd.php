@@ -1,6 +1,6 @@
 <?php
 
-namespace esp\library\gd\ext;
+namespace esp\helper\library\gd\ext;
 
 
 class Gd

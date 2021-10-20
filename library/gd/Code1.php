@@ -1,9 +1,9 @@
 <?php
 
-namespace esp\library\gd;
+namespace esp\helper\library\gd;
 
 use esp\error\EspError;
-use esp\library\gd\ext\Gd;
+use esp\helper\library\gd\ext\Gd;
 
 /**
  * 条形码

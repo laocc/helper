@@ -1,6 +1,6 @@
 <?php
 
-namespace esp\library\img;
+namespace esp\helper\library\img;
 
 
 class Text extends BaseImg

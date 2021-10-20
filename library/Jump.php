@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace esp\library;
+namespace esp\helper\library;
 
 /**
  * Class Jump

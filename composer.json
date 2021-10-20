@@ -21,7 +21,7 @@
       "function/tools.php"
     ],
     "psr-4": {
-      "esp\\library\\": "library/"
+      "esp\\helper\\library\\": "library/"
     }
   }
 }

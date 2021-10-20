@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace esp\library;
+namespace esp\helper\library;
 
-use esp\library\ext\Xss;
+use esp\helper\library\ext\Xss;
 
 /**
  * Class Input

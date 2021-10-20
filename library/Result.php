@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace esp\library;
+namespace esp\helper\library;
 
 use esp\core\ext\Paging;
 
@@ -24,10 +24,17 @@ class Result
      * @var Paging $_paging
      */
     private $_paging = null;
+    private $_error_value = array();
 
     public function __construct(string $token = __FILE__)
     {
         $this->_token = $token;
+    }
+
+    public function setError(array $error): Result
+    {
+        $this->_error_value = $error;
+        return $this;
     }
 
     /**
@@ -60,6 +67,11 @@ class Result
     {
         if ($value === -1 && $this->_error === 0) $this->_error = 1;
         else $this->_error = $value;
+
+        if (isset($this->_error_value[$this->_error])) {
+            $this->_message = $this->_error_value[$this->_error];
+        }
+
         return $this;
     }
 

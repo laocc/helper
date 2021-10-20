@@ -1,6 +1,6 @@
 <?php
 
-namespace esp\library\request;
+namespace esp\helper\library\request;
 
 use esp\error\EspError;
 

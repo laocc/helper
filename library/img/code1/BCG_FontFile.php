@@ -1,6 +1,6 @@
 <?php
 
-namespace esp\library\img\code1;
+namespace esp\helper\library\img\code1;
 
 final class BCG_FontFile implements BCG_Font
 {

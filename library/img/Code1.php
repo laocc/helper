@@ -1,12 +1,12 @@
 <?php
 
-namespace esp\library\img;
+namespace esp\helper\library\img;
 
 use esp\error\EspError;
-use esp\library\img\code1\BCG_FontFile;
-use esp\library\img\code1\BCG_code128;
-use esp\library\img\code1\BCG_Color;
-use esp\library\img\code1\BCG_FontPhp;
+use esp\helper\library\img\code1\BCG_FontFile;
+use esp\helper\library\img\code1\BCG_code128;
+use esp\helper\library\img\code1\BCG_Color;
+use esp\helper\library\img\code1\BCG_FontPhp;
 
 class Code1 extends BaseImg
 {
