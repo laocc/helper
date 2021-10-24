@@ -84,6 +84,7 @@ class Result
     {
         if (is_array($msg)) $msg = json_encode($msg, 256 | 64);
         else if (is_object($msg)) $msg = var_export($msg, true);
+
         if ($append) {
             $this->_message .= strval($msg);
         } else {
@@ -94,12 +95,16 @@ class Result
 
     /**
      * @param $key
-     * @param string $value
+     * @param $value
      * @return Result
      */
     public function data($key, $value = 'nullValue'): Result
     {
         if (is_string($key) and $value !== 'nullValue') {
+            if (is_null($value)) {
+                unset($this->_data[$key]);
+                return $this;
+            }
             if (strpos($key, '.') > 0) {
                 $obj = &$this->_data;
                 foreach (explode('.', $key) as $k) {

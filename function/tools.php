@@ -484,11 +484,12 @@ function text(string $html, int $star = null, int $stop = null): string
 {
     if ($stop === null) list($star, $stop) = [0, $star];
     $v = preg_replace(['/\&lt\;(.*?)\&gt\;/is', '/&[a-z]+?\;/i', '/<(.*?)>/is', '/[\s\x20\xa\xd\'\"\`]/is'], '', trim($html));
-    $v = str_ireplace(["\a", "\b", "\f", "\s", "\t", "\n", "\r", "\v", "\0", "\h", '  ', " ", "", "　", "	", ' '], '', $v);
+    $v = str_ireplace(["\a", "\b", "\f", "\s", "\t", "\n", "\r", "\v", "\0", "\h", '  ', "﻿", "", "　", "	", ' '], '', $v);
     return htmlentities(mb_substr($v, $star, $stop, 'utf-8'));
 }
 
 /**
+ * zwnbsp,nbsp,
  * 过滤所有可能的符号，并将连续的符号合并成1个
  * @param string $str
  * @param string $f
@@ -498,7 +499,7 @@ function replace_for_split(string $str, string $f = ','): string
 {
     if (empty($str)) return '';
     $str = mb_ereg_replace(
-        implode(['  ', " ", "", "　", "	", ' ']) .//这几个是特殊的空格
+        implode(['  ', "﻿", "", "　", "	", ' ']) .//这几个是特殊的空格
         '[\`\-\=\[\]\\\;\',\.\/\~\!\@\#\$\%\^\&\*\(\)\_\+\{\}\|\:\"\<\>\?\·【】、；‘，。/~！@#￥%……&*（）——+{}|：“《》？]',
         $f, $str);
     if (empty($f)) return $str;
