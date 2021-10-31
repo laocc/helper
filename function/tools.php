@@ -477,13 +477,21 @@ function safe_replace(string $str): string
  * @param string $html
  * @param int|null $star
  * @param int|null $stop
+ * @param bool $noSymbol
  * @return string
  */
-function text(string $html, int $star = null, int $stop = null): string
+function text(string $html, int $star = null, int $stop = null, bool $noSymbol = false): string
 {
     if ($stop === null) list($star, $stop) = [0, $star];
-    $v = preg_replace(['/\&lt\;(.*?)\&gt\;/is', '/&[a-z]+?\;/i', '/<(.*?)>/is', '/[\s\f\t\n\r\'\"\`]/is'], '', trim($html));
-    return mb_substr($v, $star, $stop, 'utf-8');
+    $html = trim($html);
+    if (empty($html)) return '';
+    $ptn = ['/\&lt\;(.*?)\&gt\;/is', '/&[a-z]+?\;/i', '/<(.*?)>/is', '/[\s\f\t\n\r\'\"\`]/is'];
+    if ($noSymbol) {
+        $ptn[] = '/[\`\‘\-\=\[\]\\\;\'\,\.\/\~\!\@\#\$\%\^\&\*\(\)\_\+\{\}\|\:\"\<\>\?\·]/';
+//        $pnt[] = '/[\【\】\、\；\，\。\！\￥\…\（\）\—\：\“\《\》\？]/';
+        $html = str_replace(['【', '】', '、', '；', '，', '。', '！', '￥', '…', '（', '）', '—', '：', '“', '《', '》', '？'], '', $html);
+    }
+    return mb_substr(preg_replace($ptn, '', $html), $star, $stop, 'utf-8');
 }
 
 /**
