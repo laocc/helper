@@ -482,7 +482,7 @@ function safe_replace(string $str): string
 function text(string $html, int $star = null, int $stop = null): string
 {
     if ($stop === null) list($star, $stop) = [0, $star];
-    $v = preg_replace(['/\&lt\;(.*?)\&gt\;/is', '/&[a-z]+?\;/i', '/<(.*?)>/is', '/[\s\a\b\f\t\n\r\v\0\h\x20\xa\xd\'\"\`]/is'], '', trim($html));
+    $v = preg_replace(['/\&lt\;(.*?)\&gt\;/is', '/&[a-z]+?\;/i', '/<(.*?)>/is', '/[\s\f\t\n\r\'\"\`]/is'], '', trim($html));
     return mb_substr($v, $star, $stop, 'utf-8');
 }
 
