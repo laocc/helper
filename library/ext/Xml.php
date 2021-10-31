@@ -184,15 +184,21 @@ final class Xml
                     $this->xml_notes($xml, $item, $row);
                 }
             } else {
-                $xml->startElement(strval($item));
-                foreach ($data as $key => $row) {
-                    if (is_string($key)) {
+                if (is_int($item)) {
+                    foreach ($data as $key => $row) {
                         $this->xml_notes($xml, $key, $row);
-                    } else {
-//                        $xml->writeAttribute('val', $this->xmlEncode($row));
                     }
+                } else {
+                    $xml->startElement(strval($item));
+                    foreach ($data as $key => $row) {
+                        if (is_string($key)) {
+                            $this->xml_notes($xml, $key, $row);
+                        } else {
+//                        $xml->writeAttribute('val', $this->xmlEncode($row));
+                        }
+                    }
+                    $xml->endElement();
                 }
-                $xml->endElement();
             }
         }
     }
