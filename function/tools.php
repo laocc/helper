@@ -469,11 +469,6 @@ function safe_replace(string $str): string
 
 /**
  * HTML截取
- * 0:194,160,32,
- * 1:194,160,
- * 2:227,128,128,
- * 3:9,
- * 4:32,
  * @param string $html
  * @param int|null $star
  * @param int|null $stop
