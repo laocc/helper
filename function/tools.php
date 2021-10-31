@@ -431,7 +431,7 @@ function array_ini($arr)
 
 /**
  * 将字符串分割成1个字的数组，主要用于中英文混合时，将中英文安全的分割开
- * @param $str
+ * @param string $str
  * @return array
  */
 function str_cut(string $str): array
@@ -482,9 +482,8 @@ function text(string $html, int $star = null, int $stop = null, bool $noSymbol =
     if (empty($html)) return '';
     $ptn = ['/\&lt\;(.*?)\&gt\;/is', '/&[a-z]+?\;/i', '/<(.*?)>/is', '/[\s\f\t\n\r\'\"\`]/is'];
     if ($noSymbol) {
-        $ptn[] = '/[\`\‘\-\=\[\]\\\;\'\,\.\/\~\!\@\#\$\%\^\&\*\(\)\_\+\{\}\|\:\"\<\>\?\·]/';
-//        $pnt[] = '/[\【\】\、\；\，\。\！\￥\…\（\）\—\：\“\《\》\？]/';
-        $html = str_replace(['【', '】', '、', '；', '，', '。', '！', '￥', '…', '（', '）', '—', '：', '“', '《', '》', '？'], '', $html);
+        $symbol = '`‘-=[];,./~!@#$%^&*()_+{}|:"<>?·【】、；，。！￥…（）—：“《》？' . "'";
+        $html = str_replace(str_cut($symbol), '', $html);
     }
     return mb_substr(preg_replace($ptn, '', $html), $star, $stop, 'utf-8');
 }
