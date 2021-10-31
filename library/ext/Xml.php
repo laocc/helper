@@ -3,11 +3,13 @@
 namespace esp\helper\library\ext;
 
 use esp\error\EspError;
+use XMLWriter;
 
 final class Xml
 {
     private $value;
     private $notes;
+    private $cData = true;
 
 
     /**
@@ -15,13 +17,9 @@ final class Xml
      * @param string $root
      * @param array $array
      * @return string
+     * @throws EspError
      */
-    /**
-     * @param string $root
-     * @param array $array
-     * @return string
-     */
-    public static function encode(string $root, array $array)
+    public static function encode(string $root, array $array): string
     {
         return (new Xml($array, $root))->render();
     }
@@ -49,7 +47,7 @@ final class Xml
      * @param $value
      * @param string $notes
      */
-    public function __construct($value, $notes = 'xml')
+    public function __construct($value, string $notes = 'xml')
     {
         if (is_array($notes) and is_string($value)) list($value, $notes) = [$notes, $value];
         if (!is_array($value)) throw new EspError('XML数据要求为数组格式');
@@ -60,11 +58,11 @@ final class Xml
 
     /**
      * @param bool $output
-     * @return \XMLWriter
+     * @return XMLWriter
      */
-    private function adapter(bool $output = true)
+    private function adapter(bool $output = true): XMLWriter
     {
-        $xml = new \XMLWriter();
+        $xml = new XMLWriter();
         if ($output) {
             $xml->openUri("php://output");
         } else {
@@ -95,7 +93,7 @@ final class Xml
             }
         } else {
             $xml->startElement($this->notes);
-            $xml->text($this->value);
+            $xml->text((string)$this->value);
             $xml->endElement();
         }
         $xml->endElement();
@@ -116,11 +114,18 @@ final class Xml
         $this->adapter(true)->flush(true);
     }
 
+    public function useCData(bool $uc): Xml
+    {
+        $this->cData = $uc;
+        return $this;
+    }
+
     /**
      * 不输出，返回解析结果
+     * @param bool $outHead
      * @return string
      */
-    public function render(bool $outHead = true)
+    public function render(bool $outHead = true): string
     {
         $xml = $this->adapter(false)->outputMemory(true);
         if (!$outHead) {
@@ -129,12 +134,16 @@ final class Xml
         return $xml;
     }
 
-    private function append(\XMLWriter $xml, $val)
+    private function append(XMLWriter $xml, $val)
     {
         if (is_numeric($val)) {
             $xml->text($val);//加：<age>35</age>
         } else {
-            $xml->writeCdata($val);//加：<name><![CDATA[老船长]]></name>中的CDATA部分
+            if ($this->cData) {
+                $xml->writeCdata($val);//加：<name><![CDATA[老船长]]></name>中的CDATA部分
+            } else {
+                $xml->text($val);
+            }
         }
     }
 
@@ -159,10 +168,11 @@ final class Xml
 
     /**
      * 节点
+     * @param XMLWriter $xml
      * @param $item
      * @param $data
      */
-    private function xml_notes(\XMLWriter $xml, $item, $data)
+    private function xml_notes(XMLWriter $xml, $item, $data)
     {
         if (is_string($item) and !is_array($data)) {//直接是终节点
             $xml->startElement($item);
@@ -174,7 +184,7 @@ final class Xml
                     $this->xml_notes($xml, $item, $row);
                 }
             } else {
-                $xml->startElement($item);
+                $xml->startElement(strval($item));
                 foreach ($data as $key => $row) {
                     if (is_string($key)) {
                         $this->xml_notes($xml, $key, $row);
@@ -206,8 +216,7 @@ final class Xml
     /**
      * 数据转码
      * @param $tag
-     * @param int $cdata
-     * @return mixed|string
+     * @return array|string|string[]
      */
     private function encodeTags($tag)
     {
