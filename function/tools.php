@@ -469,7 +469,6 @@ function safe_replace(string $str): string
 
 /**
  * HTML截取
- * str_ireplace中最后几个空白符号，不是空格，是一些特殊空格
  * 0:194,160,32,
  * 1:194,160,
  * 2:227,128,128,
@@ -483,9 +482,8 @@ function safe_replace(string $str): string
 function text(string $html, int $star = null, int $stop = null): string
 {
     if ($stop === null) list($star, $stop) = [0, $star];
-    $v = preg_replace(['/\&lt\;(.*?)\&gt\;/is', '/&[a-z]+?\;/i', '/<(.*?)>/is', '/[\s\x20\xa\xd\'\"\`]/is'], '', trim($html));
-    $v = str_ireplace(["\a", "\b", "\f", "\s", "\t", "\n", "\r", "\v", "\0", "\h", '  ', "﻿", "", "　", "	", ' '], '', $v);
-    return htmlentities(mb_substr($v, $star, $stop, 'utf-8'));
+    $v = preg_replace(['/\&lt\;(.*?)\&gt\;/is', '/&[a-z]+?\;/i', '/<(.*?)>/is', '/[\s\a\b\f\t\n\r\v\0\h\x20\xa\xd\'\"\`]/is'], '', trim($html));
+    return mb_substr($v, $star, $stop, 'utf-8');
 }
 
 /**
@@ -499,7 +497,7 @@ function replace_for_split(string $str, string $f = ','): string
 {
     if (empty($str)) return '';
     $str = mb_ereg_replace(
-        implode(['  ', "﻿", "", "　", "	", ' ']) .//这几个是特殊的空格
+        implode(['  ', "﻿", "", "​", "　", "	", ' ']) .//这几个是特殊的空格
         '[\`\-\=\[\]\\\;\',\.\/\~\!\@\#\$\%\^\&\*\(\)\_\+\{\}\|\:\"\<\>\?\·【】、；‘，。/~！@#￥%……&*（）——+{}|：“《》？]',
         $f, $str);
     if (empty($f)) return $str;
