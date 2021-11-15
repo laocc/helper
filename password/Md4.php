@@ -1,6 +1,6 @@
 <?php
 
-namespace esp\password;
+namespace esp\helper\password;
 
 class Md4
 {

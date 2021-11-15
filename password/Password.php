@@ -1,6 +1,6 @@
 <?php
 
-namespace esp\helper\library\ext;
+namespace esp\helper\password;
 
 /**
  * 密码操作类

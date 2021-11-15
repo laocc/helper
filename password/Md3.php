@@ -1,8 +1,8 @@
 <?php
 
-namespace esp\password;
+namespace esp\helper\password;
 
-class Int
+class Md3
 {
 
 }
