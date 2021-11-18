@@ -130,7 +130,7 @@ function moveTransfer(string $path, bool $show = true)
  * 读取CPU数量信息
  * @return array
  */
-function get_cpu()
+function get_cpu(): array
 {
     if (PHP_OS !== 'Linux') return [];
     $str = file_get_contents("/proc/cpuinfo");
@@ -231,7 +231,6 @@ function img_base64(string $file, bool $split = false): string
  * 将base64转换为图片
  * @param string $base64Code
  * @param string|null $fileName 不带名时为直接输出
- * @return bool
  */
 function base64_img(string $base64Code, string $fileName = null)
 {
@@ -272,9 +271,8 @@ function base64_img(string $base64Code, string $fileName = null)
  * 也就是说这些数总和不超过32，若超过32按32计算。
  * 须注意：最长为9位长，若用881284，视为8 8 1 2 8 4，中间的12视为1和2，而不视为12
  * 若需要大于10位长的，则传入数组[8,8,12,8,4]
- *
  */
-function gid($fh = null, $format = 0)
+function gid($fh = null, $format = 0): string
 {
     $md = strtoupper(md5(uniqid(mt_rand(), true)));
     if (intval($fh) > 0 and $format === 0) list($fh, $format) = [chr(45), $fh];
@@ -303,12 +301,12 @@ function gid($fh = null, $format = 0)
 
 /**
  * 生成身份证最后一位识别码
- * @param $zone
- * @param string $day
- * @param string $number
+ * @param string $zone 地区码
+ * @param string $day 生日
+ * @param string $number 后三位号码
  * @return mixed
  */
-function make_card($zone, $day = '', $number = '')
+function make_card(string $zone, string $day, string $number)
 {
     $body = "{$zone}{$day}{$number}";
     $wi = array(7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2);//加权因子
@@ -331,7 +329,7 @@ function header_state(int $code = 200, string $text = '')
     if (!stripos(PHP_SAPI, 'cgi')) {
         header("Status: {$code} {$text}", true);
     } else {
-        $protocol = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
+        $protocol = $_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.1';
         header("{$protocol} {$code} {$text}", true, $code);
     }
 }
@@ -384,7 +382,7 @@ function array_rank(array $array, string $key, bool $returnValue = false)
 
 /**
  * 数组，按某个字段排序
- * @param $array
+ * @param array $array
  * @param string $key
  * @param string $order
  */
@@ -402,11 +400,12 @@ function array_sort(array &$array, string $key, string $order = 'desc')
 }
 
 /**
- * 数组转为ini字符串
- * @param $arr
+ * 数组转为 .ini 文件内容行
+ *
+ * @param array $arr
  * @return string
  */
-function array_ini($arr)
+function array_ini(array $arr): string
 {
     $ini = [];
     foreach ($arr as $k => $a) {
@@ -485,6 +484,8 @@ function text(string $html, int $star = null, int $stop = null, bool $noSymbol =
         $symbol = '`‘-=[];,./~!@#$%^&*()_+{}|:"<>?·【】、；，。！￥…（）—：“《》？' . "'";
         $html = str_replace(str_cut($symbol), '', $html);
     }
+    $Symbol = ['  ', "﻿", "", "​", ' ', "　", "	", ' '];
+    $html = str_replace($Symbol, '', $html);
     return mb_substr(preg_replace($ptn, '', $html), $star, $stop, 'utf-8');
 }
 
@@ -498,9 +499,9 @@ function text(string $html, int $star = null, int $stop = null, bool $noSymbol =
 function replace_for_split(string $str, string $f = ','): string
 {
     if (empty($str)) return '';
+    $Symbol = ['  ', "﻿", "", "​", ' ', "　", "	", ' '];
     $str = mb_ereg_replace(
-        implode(['  ', "﻿", "", "​", "　", "	", ' ']) .//这几个是特殊的空格
-        '[\`\-\=\[\]\\\;\',\.\/\~\!\@\#\$\%\^\&\*\(\)\_\+\{\}\|\:\"\<\>\?\·【】、；‘，。/~！@#￥%……&*（）——+{}|：“《》？]',
+        implode($Symbol) . '\`\-\=\[\]\\\;\',\.\/\~\!\@\#\$\%\^\&\*\(\)\_\+\{\}\|\:\"\<\>\?\·【】、；‘，。/~！@#￥%……&*（）——+{}|：“《》？',
         $f, $str);
     if (empty($f)) return $str;
     $ff = '\\' . $f;
@@ -544,7 +545,7 @@ function xor_number(int $value, int $number, int $i = 1): bool
 
 /**
  * GB2312转UTF8
- * @param $str
+ * @param string $str
  * @return string
  */
 function utf8(string $str): string
@@ -554,7 +555,7 @@ function utf8(string $str): string
 }
 
 /**
- * @param $code
+ * @param string $code
  * @return string
  */
 function unicode_decode(string $code): string
@@ -567,7 +568,7 @@ function unicode_decode(string $code): string
 
 /**
  * 将12k,13G转换为字节长度
- * @param $size
+ * @param string $size
  * @return int
  */
 function re_size(string $size): int

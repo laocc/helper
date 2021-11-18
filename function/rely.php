@@ -100,10 +100,11 @@ function root(string $path, bool $real = false): string
 /**
  * 储存文件
  * @param string $file
- * @param string $content
+ * @param  $content
  * @param bool $append
- * @param array $trace
+ * @param array|null $trace
  * @return int
+ * @throws \ErrorException
  */
 function save_file(string $file, $content, bool $append = false, array $trace = null): int
 {
@@ -148,7 +149,12 @@ function mk_dir(string $path, int $mode = 0744, array $trace = null): bool
     if ($check !== '/') $path = dirname($path);
 
     try {
-        if (!file_exists($path)) @mkdir($path, $mode ?: 0740, true);
+        $fn = fopen(__FILE__, 'r');
+        if (flock($fn, LOCK_EX)) {
+            if (!file_exists($path)) @mkdir($path, $mode ?: 0740, true);
+            flock($fn, LOCK_UN);
+        }
+        fclose($fn);
         return true;
     } catch (\Error $e) {
         return false;
