@@ -2,10 +2,13 @@
 
 namespace esp\helper;
 
+use esp\helper\library\Error;
+use esp\helper\library\ext\Xml;
+
 /**
  * 查询域名的根域名，兼容国别的二级域名
  * @param string $domain
- * @param string $branch
+ * @param null $branch
  * @return string
  */
 function host(string $domain, $branch = null): string
@@ -37,7 +40,7 @@ function host(string $domain, $branch = null): string
 
 /**
  * 提取URL中的域名
- * @param $url
+ * @param string $url
  * @return string
  */
 function domain(string $url): string
@@ -62,7 +65,7 @@ function same_first(string $str1, string $str2): string
 
 /**
  * 加载文件，同时加载结果被缓存
- * @param $file
+ * @param string $file
  * @return bool|mixed
  */
 function load(string $file)
@@ -102,7 +105,7 @@ function root(string $path, bool $real = false): string
  * @param bool $append
  * @param array|null $trace
  * @return int
- * @throws \ErrorException
+ * @throws Error
  */
 function save_file(string $file, $content, bool $append = false, array $trace = null): int
 {
@@ -128,7 +131,7 @@ function save_file(string $file, $content, bool $append = false, array $trace = 
  * @param int $mode
  * @param array|null $trace
  * @return bool
- * @throws \ErrorException
+ * @throws Error
  */
 function mk_dir(string $path, int $mode = 0744, array $trace = null): bool
 {
@@ -140,7 +143,7 @@ function mk_dir(string $path, int $mode = 0744, array $trace = null): bool
         $file = $trace['file'] ?? '';
         $line = $trace['line'] ?? 0;
 
-        throw new \ErrorException("目录或文件名中必须要含有/号，当前path=" . var_export($path, true),
+        throw new Error("目录或文件名中必须要含有/号，当前path=" . var_export($path, true),
             500, 1, $file, $line);
     }
 
@@ -187,7 +190,7 @@ function xml_decode(string $str, bool $toArray = true)
  */
 function xml_encode($root, array $array, bool $outHead = true): string
 {
-    return (new \esp\helper\library\ext\Xml($array, $root))->render($outHead);
+    return (new Xml($array, $root))->render($outHead);
 }
 
 
@@ -214,7 +217,7 @@ function str_rand(int $min = 10, int $max = null, bool $hex = false): string
 
 /**
  * 格式化字符串，对date函数的一点延伸
- * @param $str
+ * @param string $str
  * @return mixed
  */
 function format(string $str): string
@@ -254,7 +257,7 @@ function replace_array(string $str, array $arr): string
  * @param mixed ...$key
  * @return array
  */
-function array_select(array $arr, ...$key)
+function array_select(array $arr, ...$key): array
 {
     if (count($key) === 1) {
         if (is_array($key[0])) $key = $key[0];
