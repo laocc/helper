@@ -2,7 +2,7 @@
 
 namespace esp\helper\library\request;
 
-use esp\error\EspError;
+use esp\helper\library\Error;
 
 abstract class Request
 {
@@ -136,9 +136,9 @@ abstract class Request
 
     protected function getData(string &$key, &$force)
     {
-        if ($this->_off && $this->_isPost) throw new EspError('POST已被注销，不能再次引用，请在调用error()之前读取所有数据。', 2);
+        if ($this->_off && $this->_isPost) throw new Error('POST已被注销，不能再次引用，请在调用error()之前读取所有数据。', 2);
 
-        if (empty($key)) throw new EspError('参数必须明确指定', 2);
+        if (empty($key)) throw new Error('参数必须明确指定', 2);
 
         $force = true;
         if ($key[0] === '?') {

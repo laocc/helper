@@ -2,7 +2,7 @@
 
 namespace esp\helper\library\gd;
 
-use esp\error\EspError;
+use esp\helper\library\Error;
 use esp\helper\library\gd\ext\Gd;
 
 /**
@@ -398,7 +398,7 @@ class Image
                 default:
                     return [0, 0, 0, 0, $info[2], 'fail'];
             }
-        } catch (EspError $error) {
+        } catch (Error $error) {
             print_r($error);
             return [0, 0, 0, 0, $info[2], 'error'];
         }

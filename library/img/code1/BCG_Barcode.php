@@ -2,7 +2,7 @@
 
 namespace esp\helper\library\img\code1;
 
-use esp\error\EspError;
+use esp\helper\library\Error;
 
 abstract class BCG_Barcode
 {
@@ -122,7 +122,7 @@ abstract class BCG_Barcode
     {
         $scale = intval($scale);
         if ($scale <= 0) {
-            throw new EspError('The scale must be larger than 0.');
+            throw new Error('The scale must be larger than 0.');
         }
 
         $this->scale = $scale;
@@ -227,7 +227,7 @@ abstract class BCG_Barcode
     {
         $offsetX = intval($offsetX);
         if ($offsetX < 0) {
-            throw new EspError('The offset X must be 0 or larger.');
+            throw new Error('The offset X must be 0 or larger.');
         }
 
         $this->offsetX = $offsetX;
@@ -252,7 +252,7 @@ abstract class BCG_Barcode
     {
         $offsetY = intval($offsetY);
         if ($offsetY < 0) {
-            throw new EspError('The offset Y must be 0 or larger.');
+            throw new Error('The offset Y must be 0 or larger.');
         }
 
         $this->offsetY = $offsetY;

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace esp\helper\library\request;
 
-use esp\error\EspError;
+use esp\helper\library\Error;
 use esp\helper\library\ext\Xss;
 use function esp\helper\is_card;
 use function esp\helper\is_date;
@@ -45,7 +45,6 @@ class Get extends Request
      * @param string $key
      * @param string $type
      * @return string
-     * @throws EspError
      */
     public function filter(string $key, string $type): string
     {
@@ -111,7 +110,6 @@ class Get extends Request
      * @param string $key
      * @param string $symbol
      * @return array
-     * @throws EspError
      */
     public function date_zone(string $key, string $symbol = ','): array
     {
@@ -175,7 +173,6 @@ class Get extends Request
      * @param string $key
      * @param bool $cent
      * @return int
-     * @throws EspError
      */
     public function money(string $key, bool $cent = true): int
     {
@@ -186,7 +183,7 @@ class Get extends Request
 
     public function match(string $key, string $pnt): string
     {
-        if (!is_match($pnt)) throw new EspError('传入的表达式不合法', 1);
+        if (!is_match($pnt)) throw new Error('传入的表达式不合法', 1);
         $value = $this->getData($key, $force);
         if (is_null($value)) return '';
 

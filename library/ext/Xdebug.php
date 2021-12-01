@@ -2,7 +2,7 @@
 
 namespace esp\helper\library\ext;
 
-use esp\error\EspError;
+use esp\helper\library\Error;
 
 /**
  * 仅仅是对Xdebug的结果进行可读重排版，不是用来控制Xdebug的
@@ -254,7 +254,7 @@ CSS;
     {
         $files = file($filePath);
         if (empty($files)) {
-            throw new EspError("{$filePath} 不是有效文件。");
+            throw new Error("{$filePath} 不是有效文件。");
         }
 
         foreach ($files as $line => &$row) {

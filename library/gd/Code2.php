@@ -2,7 +2,7 @@
 
 namespace esp\helper\library\gd;
 
-use esp\error\EspError;
+use esp\helper\library\Error;
 use esp\helper\library\gd\ext\Gd;
 
 /**
@@ -671,7 +671,7 @@ class qr_InputItem
         }
 
         if (!qr_Input::check($mode, $size, $setData)) {
-            throw new EspError('Error m:' . $mode . ',s:' . $size . ',d:' . join(',', $setData));
+            throw new Error('Error m:' . $mode . ',s:' . $size . ',d:' . join(',', $setData));
         }
 
         $this->mode = $mode;
@@ -710,7 +710,7 @@ class qr_InputItem
             $this->bstream = $bs;
             return 0;
 
-        } catch (EspError $e) {
+        } catch (Error $e) {
             return -1;
         }
     }
@@ -740,7 +740,7 @@ class qr_InputItem
             $this->bstream = $bs;
             return 0;
 
-        } catch (EspError $e) {
+        } catch (Error $e) {
             return -1;
         }
     }
@@ -761,7 +761,7 @@ class qr_InputItem
             $this->bstream = $bs;
             return 0;
 
-        } catch (EspError $e) {
+        } catch (Error $e) {
             return -1;
         }
     }
@@ -780,7 +780,7 @@ class qr_InputItem
             $this->bstream = $bs;
             return 0;
 
-        } catch (EspError $e) {
+        } catch (Error $e) {
             return -1;
         }
     }
@@ -868,7 +868,7 @@ class qr_InputItem
 
             return $this->bstream->size();
 
-        } catch (EspError $e) {
+        } catch (Error $e) {
             return -1;
         }
     }
@@ -886,7 +886,7 @@ class qr_Input
     public function __construct($version = 0, $level = 0)
     {
         if ($version < 0 || $version > 40 || $level > 3) {
-            throw new EspError('Invalid version no');
+            throw new Error('Invalid version no');
         }
 
         $this->version = $version;
@@ -903,7 +903,7 @@ class qr_Input
     public function setVersion($version)
     {
         if ($version < 0 || $version > 40) {
-            throw new EspError('Invalid version no');
+            throw new Error('Invalid version no');
         }
 
         $this->version = $version;
@@ -921,7 +921,7 @@ class qr_Input
     public function setErrorCorrectionLevel($level)
     {
         if ($level > 3) {
-            throw new EspError('Invalid ECLEVEL');
+            throw new Error('Invalid ECLEVEL');
         }
 
         $this->level = $level;
@@ -942,7 +942,7 @@ class qr_Input
             $entry = new qr_InputItem($mode, $size, $data);
             $this->items[] = $entry;
             return 0;
-        } catch (EspError $e) {
+        } catch (Error $e) {
             return -1;
         }
     }
@@ -1186,7 +1186,7 @@ class qr_Input
 
             $ver = qr_Spec::getMinimumVersion((int)(($bits + 7) / 8), $this->level);
             if ($ver < 0) {
-                throw new EspError('WRONG VERSION');
+                throw new Error('WRONG VERSION');
             } else if ($ver > $this->getVersion()) {
                 $this->setVersion($ver);
             } else {
@@ -2042,7 +2042,7 @@ class qr_RawCode
 
         $this->datacode = $input->getByteStream();
         if (is_null($this->datacode)) {
-            throw new EspError('null imput string');
+            throw new Error('null imput string');
         }
 
         qr_Spec::getEccSpec($input->getVersion(), $input->getErrorCorrectionLevel(), $spec);
@@ -2056,7 +2056,7 @@ class qr_RawCode
 
         $ret = $this->init($spec);
         if ($ret < 0) {
-            throw new EspError('block alloc error');
+            throw new Error('block alloc error');
         }
 
         $this->count = 0;
@@ -2241,10 +2241,10 @@ class qr_Encode
     private static function encodeString($string, $version, $level, $hint, $casesensitive)
     {
         if (is_null($string) || $string == '\0' || $string == '') {
-            throw new EspError('empty string');
+            throw new Error('empty string');
         }
         if ($hint != 2 && $hint != 3) {
-            throw new EspError('bad hint');
+            throw new Error('bad hint');
         }
 
         $input = new qr_Input($version, $level);
@@ -2265,10 +2265,10 @@ class qr_Encode
     private static function encodeMask(qr_Input $input, $mask)
     {
         if ($input->getVersion() < 0 || $input->getVersion() > 40) {
-            throw new EspError('wrong version');
+            throw new Error('wrong version');
         }
         if ($input->getErrorCorrectionLevel() > 3) {
-            throw new EspError('wrong level');
+            throw new Error('wrong level');
         }
 
         $raw = new qr_RawCode($input);

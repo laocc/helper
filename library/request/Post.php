@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace esp\helper\library\request;
 
-use esp\error\EspError;
+use esp\helper\library\Error;
 use esp\helper\library\ext\Xss;
 use function esp\helper\is_mob;
 use function esp\helper\is_card;
@@ -95,7 +95,6 @@ final class Post extends Request
      * @param string $key
      * @param string ...$type 可以有多个检查规则，任一个符合即为合法值
      * @return string
-     * @throws EspError
      */
     public function filter(string $key, string ...$type): string
     {
@@ -256,7 +255,6 @@ final class Post extends Request
      * @param string $key
      * @param bool $cent
      * @return int
-     * @throws EspError
      */
     public function money(string $key, bool $cent = true): int
     {
@@ -272,7 +270,7 @@ final class Post extends Request
     {
         $this->_min = null;
         $this->_max = null;
-        if (!is_match($pnt)) throw new EspError('传入的表达式不合法', 1);
+        if (!is_match($pnt)) throw new Error('传入的表达式不合法', 1);
         $value = $this->getData($key, $force);
         if (is_null($value)) return '';
         if (empty($value) && $force) $this->recodeError($key);
@@ -291,7 +289,6 @@ final class Post extends Request
      * @param string $key
      * @param int $options
      * @return string
-     * @throws EspError
      */
     public function json(string $key, int $options = 256 | 64): string
     {
@@ -319,7 +316,6 @@ final class Post extends Request
      * @param string $key
      * @param string $root
      * @return string
-     * @throws EspError
      */
     public function xml(string $key, string $root = 'xml'): string
     {
@@ -347,7 +343,6 @@ final class Post extends Request
      * @param string $key
      * @param string $encode
      * @return array
-     * @throws EspError
      */
     public function array(string $key, string $encode = 'json'): array
     {
@@ -405,13 +400,13 @@ final class Post extends Request
     public function __construct(string $type = null)
     {
         $this->_isPost = true;
-        if (is_null($type) or $type === 'post') {
+        if ($type === 'post' or (strpos(getenv('HTTP_CONTENT_TYPE') ?: '', 'boundary') > 0)) {
             $this->_data = $_POST;
             return;
         }
 
         $this->_raw = file_get_contents('php://input');
-        if (empty($this->_raw)) return;
+        if (empty($this->_raw) and is_null($type)) return;
 
         switch ($type) {
             case 'json':

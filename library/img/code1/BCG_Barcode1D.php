@@ -2,7 +2,7 @@
 
 namespace esp\helper\library\img\code1;
 
-use esp\error\EspError;
+use esp\helper\library\Error;
 
 abstract class BCG_Barcode1D extends BCG_Barcode
 {
@@ -45,7 +45,7 @@ abstract class BCG_Barcode1D extends BCG_Barcode
     {
         $this->thickness = intval($thickness);
         if ($this->thickness <= 0) {
-            throw new EspError('The thickness must be larger than 0.');
+            throw new Error('The thickness must be larger than 0.');
         }
     }
 

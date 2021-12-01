@@ -2,7 +2,7 @@
 
 namespace esp\helper\library\img;
 
-use esp\error\EspError;
+use esp\helper\library\Error;
 use esp\helper\library\img\code1\BCG_FontFile;
 use esp\helper\library\img\code1\BCG_code128;
 use esp\helper\library\img\code1\BCG_Color;
@@ -44,7 +44,7 @@ class Code1 extends BaseImg
         $option['path'] = '/' . trim($option['path'], '/') . '/';
 
         if (!preg_match('/^[\x20\w\!\@\#\$\%\^\&\*\(\)\_\+\`\-\=\[\]\{\}\;\'\\\:\"\|\,\.\/\<\>\?]+$/', $option['code'])) {
-            throw new EspError("条形码只能是英文、数字及半角符号组成");
+            throw new Error("条形码只能是英文、数字及半角符号组成");
         }
 
         if (!!$option['split']) {
