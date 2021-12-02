@@ -231,6 +231,8 @@ function img_base64(string $file, bool $split = false): string
  * 将base64转换为图片
  * @param string $base64Code
  * @param string|null $fileName 不带名时为直接输出
+ * @return bool
+ * @throws library\Error
  */
 function base64_img(string $base64Code, string $fileName = null)
 {
@@ -440,6 +442,24 @@ function str_cut(string $str): array
         $arr[] = mb_substr($str, $i, 1, "utf8");
     }
     return $arr;
+}
+
+/**
+ * 将字符串大小写对换，只能用于纯英文半角
+ *
+ * @param $string
+ * @return string
+ */
+function swap_case($string): string
+{
+    $str = [];
+    for ($i = 0; $i < strlen($string); $i++) {
+        $ord = ord($string[$i]);
+        if ($ord >= 65 && $ord <= 90) $str[] = chr($ord + 32);
+        else if ($ord >= 97 && $ord <= 122) $str[] = chr($ord - 32);
+        else $str[] = $string[$i];
+    }
+    return implode($str);
 }
 
 
