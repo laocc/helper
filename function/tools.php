@@ -303,14 +303,25 @@ function gid($fh = null, $format = 0): string
 
 /**
  * 生成身份证最后一位识别码
+ *
  * @param string $zone 地区码
- * @param string $day 生日
- * @param string $number 后三位号码
- * @return mixed
+ * @param string|null $day 生日
+ * @param string|null $number 后三位号码
+ * @return string
  */
-function make_card(string $zone, string $day, string $number)
+function make_card(string $zone, string $day = null, string $number = null): string
 {
+    if (is_null($day)) {
+        if (!preg_match('/^(\d{6})(\d{8})(\d{3})/', $zone, $mat)) return '身份证号前17位格式不正确';
+        $zone = $mat[1];
+        $day = $mat[2];
+        $number = $mat[3];
+    }
+    if (!is_date($day)) return '日期格式不正确';
+
     $body = "{$zone}{$day}{$number}";
+    if (strlen($body) !== 17) return '数据格式不对';
+
     $wi = array(7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2);//加权因子
     $sigma = 0;
     for ($i = 0; $i < 17; $i++) {
@@ -531,7 +542,7 @@ function replace_for_split(string $str, string $f = ','): string
 /**
  * 计算一个2倍等比数列组成，
  * 比如：10=8+2，14=8+4+2，22=16+4+2。
- * @param $num
+ * @param int $num
  * @return array
  */
 function numbers(int $num): array
