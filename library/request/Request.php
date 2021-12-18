@@ -106,9 +106,10 @@ abstract class Request
      * 只能满足常见签名方法 https://pay.weixin.qq.com/wiki/doc/api/H5.php?chapter=4_3
      *
      * @param array $param
+     * @param string|null $signStr
      * @return bool|string
      */
-    public function signCheck(array $param = [])
+    public function signCheck(array $param = [], string &$signStr = null)
     {
         $sKey = $param['sign_key'] ?? 'sign';
         $tKey = $param['token_key'] ?? 'key';
@@ -128,10 +129,12 @@ abstract class Request
             else if (is_array($v)) $v = json_encode($v, 256 | 64);
             $str .= "{$k}={$v}&";
         }
-        $md5 = md5("{$str}{$tKey}={$token}");
-        if ($sign === 'create') return $md5;
+        $signStr = ("{$str}{$tKey}={$token}");
 
-        return hash_equals(strtoupper($sign), strtoupper($md5));
+        if ($sign === 'string') return ($signStr);
+        else if ($sign === 'create') return md5($signStr);
+
+        return hash_equals(strtoupper($sign), strtoupper(md5($signStr)));
     }
 
     protected function getData(string &$key, &$force)
