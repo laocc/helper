@@ -115,6 +115,49 @@ function save_file(string $file, $content, bool $append = false, array $trace = 
     return file_put_contents($file, $content, $append ? FILE_APPEND : LOCK_EX);
 }
 
+/**
+ * 注意：如果系统服务是分布式，要考虑统一性问题，这个锁只锁同一服务器上的业务
+ *
+ * @param string $lockKey
+ * @param callable $callable
+ * @param mixed ...$args
+ * @return mixed
+ */
+function locked(string $lockKey, callable $callable, ...$args)
+{
+    $rest = null;
+    $lTime = microtime(true);
+    [$time, $min] = explode('.', strval($lTime));
+    $min = substr($min, 0, 4);
+    $time = intval($time);
+
+    $operation = LOCK_EX;
+    if ($lockKey[0] === '#') {
+        $lockKey = substr($lockKey, 1);
+        $operation = LOCK_EX | LOCK_NB;
+    }
+
+    $lockKey = str_replace(['/', '\\', '*', '"', "'", '<', '>', ':', ';', '?'], '', $lockKey);
+    $path = _RUNTIME . '/flock/' . date('Y-m-d/');
+    if (!is_dir($path)) mkdir($path, 0740, true);
+
+    $fn = fopen("{$path}{$lockKey}.lock", 'a');
+    $message = 'Not Run';
+    if (flock($fn, $operation)) {//加锁
+        try {
+            $rest = $callable(...$args);//执行
+            $message = 'TRUE';
+        } catch (\Exception $exception) {
+            $message = $exception->getMessage();
+        }
+        flock($fn, LOCK_UN);//解锁
+    }
+
+    $runTime = (microtime(true) - $lTime) * 1000;
+    fwrite($fn, date("Y-m-d H:i:s", $time) . ".{$min}\t{$runTime}\t{$message}\n");
+    fclose($fn);
+    return $rest;
+}
 
 /**
  * 文件权限： 所有者  所有者组    其它用户
@@ -137,29 +180,14 @@ function mk_dir(string $path, int $mode = 0744, array $trace = null): bool
 {
     if (!$path) return false;
     $check = strrchr($path, '/');
-
     if ($check === false) {
-        if (is_null($trace)) $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
-        $file = $trace['file'] ?? '';
-        $line = $trace['line'] ?? 0;
+        throw new Error("目录或文件名中必须要含有/号，当前path=" . var_export($path, true));
+    } else if ($check !== '/') $path = dirname($path);
 
-        throw new Error("目录或文件名中必须要含有/号，当前path=" . var_export($path, true),
-            500, 1, $file, $line);
-    }
-
-    if ($check !== '/') $path = dirname($path);
-
-    try {
-        $fn = fopen(__FILE__, 'r');
-        if (flock($fn, LOCK_EX)) {
-            if (!file_exists($path)) @mkdir($path, $mode ?: 0740, true);
-            flock($fn, LOCK_UN);
-        }
-        fclose($fn);
+    return locked('mkdir', function ($path, $mode) {
+        if (!file_exists($path)) @mkdir($path, $mode ?: 0740, true);
         return true;
-    } catch (\Error $e) {
-        return false;
-    }
+    }, $path, $mode);
 }
 
 
@@ -187,6 +215,7 @@ function xml_decode(string $str, bool $toArray = true)
  * @param array $array
  * @param bool $outHead
  * @return string
+ * @throws Error
  */
 function xml_encode($root, array $array, bool $outHead = true): string
 {
