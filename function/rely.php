@@ -128,18 +128,19 @@ function save_file(string $file, $content, bool $append = false, array $trace = 
 function locked(string $lockKey, callable $callable, ...$args)
 {
     $operation = ($lockKey[0] === '#') ? (LOCK_EX | LOCK_NB) : LOCK_EX;
-    $fn = fopen(($lockFile = '/tmp/' . md5($lockKey) . '.lock'), 'a');
+    $lockKey = date('Y-m-d H-i-s ') . str_replace(['/', '\\', '*', '"', "'", '<', '>', ':', ';', '?'], '', $lockKey);
+    $fn = fopen(($lockFile = "/tmp/{$lockKey}.flock"), 'a');
     if (flock($fn, $operation)) {//加锁
         try {
             $rest = $callable(...$args);//执行
         } catch (\Exception $exception) {
-            $rest = 'locked:' . $exception->getMessage();
+            $rest = 'locked: ' . $exception->getMessage();
         } catch (\Error $error) {
-            $rest = 'locked:' . $error->getMessage();
+            $rest = 'locked: ' . $error->getMessage();
         }
         flock($fn, LOCK_UN);//解锁
     } else {
-        $rest = "locked:Running";
+        $rest = "locked: Running";
     }
     fclose($fn);
     unlink($lockFile);
