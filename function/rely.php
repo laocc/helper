@@ -118,6 +118,8 @@ function save_file(string $file, $content, bool $append = false, array $trace = 
 /**
  * 注意：如果系统服务是分布式，要考虑统一性问题，这个锁只锁同一服务器上的业务
  *
+ * 锁内返回值都不得是字符串，因为锁返回的如果是字串，则表示为出错信息
+ *
  * @param string $lockKey
  * @param callable $callable
  * @param mixed ...$args
@@ -125,37 +127,22 @@ function save_file(string $file, $content, bool $append = false, array $trace = 
  */
 function locked(string $lockKey, callable $callable, ...$args)
 {
-    $rest = null;
-    $lTime = microtime(true);
-    [$time, $min] = explode('.', strval($lTime));
-    $min = substr($min, 0, 4);
-    $time = intval($time);
-
-    $operation = LOCK_EX;
-    if ($lockKey[0] === '#') {
-        $lockKey = substr($lockKey, 1);
-        $operation = LOCK_EX | LOCK_NB;
-    }
-
-    $lockKey = str_replace(['/', '\\', '*', '"', "'", '<', '>', ':', ';', '?'], '', $lockKey);
-    $path = _RUNTIME . '/flock/' . date('Y-m-d/');
-    if (!is_dir($path)) mkdir($path, 0740, true);
-
-    $fn = fopen("{$path}{$lockKey}.lock", 'a');
-    $message = 'Not Run';
+    $operation = ($lockKey[0] === '#') ? (LOCK_EX | LOCK_NB) : LOCK_EX;
+    $fn = fopen(($lockFile = '/tmp/' . md5($lockKey) . '.lock'), 'a');
     if (flock($fn, $operation)) {//加锁
         try {
             $rest = $callable(...$args);//执行
-            $message = 'TRUE';
         } catch (\Exception $exception) {
-            $message = $exception->getMessage();
+            $rest = 'locked:' . $exception->getMessage();
+        } catch (\Error $error) {
+            $rest = 'locked:' . $error->getMessage();
         }
         flock($fn, LOCK_UN);//解锁
+    } else {
+        $rest = "locked:Running";
     }
-
-    $runTime = (microtime(true) - $lTime) * 1000;
-    fwrite($fn, date("Y-m-d H:i:s", $time) . ".{$min}\t{$runTime}\t{$message}\n");
     fclose($fn);
+    unlink($lockFile);
     return $rest;
 }
 
