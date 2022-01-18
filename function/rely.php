@@ -87,8 +87,8 @@ function load(string $file)
  */
 function root(string $path, bool $real = false): string
 {
-    foreach (['home', 'mnt', 'mdb', 'mda', 'tmp'] as $r) {
-        if (stripos($path, "/{$r}/") === 0) goto end;
+    foreach (['/home/', '/mnt/', '/mdb/', '/mda/', '/mdc/', '/tmp/', '/www/'] as $r) {
+        if (strpos($path, $r) === 0) goto end;
     }
 
     if (stripos($path, _ROOT) !== 0) $path = _ROOT . "/" . trim($path, '/');
@@ -143,7 +143,7 @@ function locked(string $lockKey, callable $callable, ...$args)
         $rest = "locked: Running";
     }
     fclose($fn);
-    unlink($lockFile);
+    if (is_readable($lockFile)) @unlink($lockFile);
     return $rest;
 }
 
