@@ -4,6 +4,7 @@ namespace esp\helper\library\gd;
 
 use esp\helper\library\Error;
 use esp\helper\library\gd\ext\Gd;
+use function esp\helper\mk_dir;
 
 /**
  * 图片处理类：
@@ -22,7 +23,7 @@ class Image
 {
     const Quality = 80;    //JPG默认质量，对所有方法都有效
 
-    static private $backup = Array();
+    static private $backup = array();
     static private $pattern;
 
     /**
@@ -271,11 +272,12 @@ class Image
      * @param null $path
      * @param null $option
      * @return bool|string
+     * @throws Error
      */
     public static function thumbs($path = null, $option = null)
     {
         if (is_array($path)) list($path, $option) = [$option, $path];
-        if (!is_array($option)) $option = Array();
+        if (!is_array($option)) $option = array();
 
         $option += [
             'save' => 2,//0：只显示，1：只保存，2：即显示也保存
@@ -345,7 +347,7 @@ class Image
             $option['mode'] = strtolower($matches[$option['seat']['mode']]);//xvz之一;
         }
         $saveFile = rtrim($path, '/') . '/' . trim($Url, '/');
-        if (!is_readable(($fp = dirname($saveFile)))) mkdir($fp, 0740, true);
+        mk_dir($saveFile);
 
         if ($option['tclip'] and $option['model'] === 'x' and function_exists('tclip')) {
             return self::thumbs_tclip($saveFile, $option);
@@ -628,7 +630,7 @@ class Image
     public static function thumbs_old($path = null, $option = null)
     {
         if (is_array($path)) list($path, $option) = [$option, $path];
-        if (!is_array($option)) $option = Array();
+        if (!is_array($option)) $option = array();
 
         $option += [
             'save' => 2,//0：只显示，1：只保存，2：即显示也保存
