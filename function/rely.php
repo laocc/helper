@@ -128,7 +128,7 @@ function save_file(string $file, $content, bool $append = false, array $trace = 
 function locked(string $lockKey, callable $callable, ...$args)
 {
     $operation = ($lockKey[0] === '#') ? (LOCK_EX | LOCK_NB) : LOCK_EX;
-    $lockKey = date('Y-m-d H-i-s ') . str_replace(['/', '\\', '*', '"', "'", '<', '>', ':', ';', '?'], '', $lockKey);
+    $lockKey = str_replace(['/', '\\', '*', '"', "'", '<', '>', ':', ';', '?'], '', $lockKey);
     $fn = fopen(($lockFile = "/tmp/{$lockKey}.flock"), 'a');
     if (flock($fn, $operation)) {//加锁
         try {
