@@ -695,3 +695,99 @@ function object_json(string $jsObject)
         ['"\1":', ': "\1"'],
         $jsObject);
 }
+
+
+/**
+ * 表格打印，字段需相同
+ *
+ * $json = '[{"ID":24345,"名字":"张三","年龄":"34","性别":"男","手机号":"23452345sdfad"},{"ID":24345,"名字":"李四","年龄":"34","性别":"男","手机号":"中23452混合中文3454"},{"ID":24345,"名字":"王五","年龄":"34","性别":"男","手机号":"纯中文"}]';
+ * _table(json_decode($json, true));
+ *
+ * ┏━━┳━━┓
+ * ┣━━╋━━┫
+ * ┗━━┻━━┛
+ *
+ * @param array $data
+ */
+function _table(array $data)
+{
+    /**
+     * 字串实际显示占位
+     * @param string $w
+     * @return float|int
+     */
+    $wLen = function (string $w) {
+        $l = strlen($w);
+        $s = mb_strlen($w);
+        return $s + ($l - $s) / 2;
+    };
+
+
+    $width = [];
+    $title = array_keys($data[0]);
+    foreach ($data as $rs) {
+        $title = array_merge($title, array_keys($rs));
+        $title = array_unique($title);
+        foreach ($rs as $w => $v) {
+            if (!isset($width[$w])) $width[$w] = 0;
+            $width[$w] = max($width[$w], $wLen($w), $wLen($v));
+        }
+    }
+
+
+    $len = count($title);
+    $index = 0;
+    foreach ($width as $w => $l) {
+        $index++;
+        if ($index === 1) echo "┏";
+        echo str_repeat("━", $l);
+        if ($index === $len) echo "┓\n";
+        else echo "┳";
+    }
+
+    $index = 0;
+    foreach ($title as $t) {
+        $index++;
+        if ($index === 1) echo "┃";
+        $sLen = min(strlen($t), mb_strlen($t) * 2);
+
+        $lost = $width[$t] - $sLen;
+        echo $t;
+        if ($lost) echo str_repeat(" ", $lost);
+
+        echo "┃";
+        if ($index === $len) echo "\n";
+    }
+    $index = 0;
+    foreach ($width as $w => $l) {
+        $index++;
+        if ($index === 1) echo "┣";
+        echo str_repeat("━", $l);
+        if ($index === $len) echo "┫\n";
+        else echo "╋";
+    }
+
+    foreach ($data as $rs) {
+        $index = 0;
+        foreach ($rs as $r => $v) {
+            $index++;
+            if ($index === 1) echo "┃";
+            $lost = $width[$r] - $wLen($v);
+            echo $v;
+            if ($lost) echo str_repeat(" ", $lost);
+            echo "┃";
+            if ($index === $len) echo "\n";
+        }
+    }
+
+    $index = 0;
+    foreach ($width as $w => $l) {
+        $index++;
+        if ($index === 1) echo "┗";
+        echo str_repeat("━", $l);
+        if ($index === $len) echo "┛\n";
+        else echo "┻";
+    }
+}
+
+
