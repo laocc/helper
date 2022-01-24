@@ -696,6 +696,27 @@ function object_json(string $jsObject)
         $jsObject);
 }
 
+/**
+ * CLI环境下，屏幕可打印宽度
+ *
+ * @return int
+ */
+function screen_width(): int
+{
+    if (!_CLI) return 0;
+    $size = null;
+    $fp = popen('stty size', "r");
+    while (!feof($fp)) {
+        if ($item = fgets($fp, 12)) {
+            $size = explode(' ', $item);
+            break;
+        }
+    }
+    pclose($fp);
+    if (is_null($size)) return 0;
+    return intval($size[1]);
+}
+
 
 /**
  * 表格打印，字段需相同
@@ -703,34 +724,45 @@ function object_json(string $jsObject)
  * $json = '[{"ID":24345,"名字":"张三","年龄":"34","性别":"男","手机号":"23452345sdfad"},{"ID":24345,"名字":"李四","年龄":"34","性别":"男","手机号":"中23452混合中文3454"},{"ID":24345,"名字":"王五","年龄":"34","性别":"男","手机号":"纯中文"}]';
  * _table(json_decode($json, true));
  *
- * ┏━━┳━━┓
- * ┣━━╋━━┫
- * ┗━━┻━━┛
- *
- * @param array $data
+ * 统一中边
+ * ┏━━━┳━━━┓
+ * ┣━━━╋━━━┫
+ * ┃   ┃   ┃
+ * ┗━━━┻━━━┛
+ * 统一细边
+ * ┌───┬───┐
+ * ├───┼───┤
+ * │   │   │
+ * └───┴───┘
+ * 双边
+ * ╔═══╦═══╗
+ * ╠═══╬═══╣
+ * ║   ║   ║
+ * ╚═══╩═══╝
+ * 外粗内细
+ * ┏━━━┯━━━┓
+ * ┠───┼───┨
+ * ┃   │   ┃
+ * ┗━━━┷━━━┛
+ * * @param array $data
  */
 function _table(array $data)
 {
     /**
-     * 字串实际显示占位
+     * 字串实际显示占位，utf8是3位，实际显示出来到终端gbk是2位
      * @param string $w
      * @return float|int
      */
     $wLen = function (string $w) {
-        $l = strlen($w);
-        $s = mb_strlen($w);
-        return $s + ($l - $s) / 2;
+        return ($s = mb_strlen($w)) + (strlen($w) - $s) / 2;
     };
-
 
     $width = [];
     $title = array_keys($data[0]);
     foreach ($data as $rs) {
-        $title = array_merge($title, array_keys($rs));
-        $title = array_unique($title);
+        $title = array_unique(array_merge($title, array_keys($rs)));
         foreach ($rs as $w => $v) {
-            if (!isset($width[$w])) $width[$w] = 0;
-            $width[$w] = max($width[$w], $wLen($w), $wLen($v));
+            $width[$w] = max($width[$w] ?? 0, $wLen($w), $wLen($v));
         }
     }
 
@@ -749,15 +781,15 @@ function _table(array $data)
     foreach ($title as $t) {
         $index++;
         if ($index === 1) echo "┃";
-        $sLen = min(strlen($t), mb_strlen($t) * 2);
 
-        $lost = $width[$t] - $sLen;
+        $lost = $width[$t] - $wLen($t);
         echo $t;
         if ($lost) echo str_repeat(" ", $lost);
 
         echo "┃";
         if ($index === $len) echo "\n";
     }
+
     $index = 0;
     foreach ($width as $w => $l) {
         $index++;
