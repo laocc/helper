@@ -218,6 +218,7 @@ final class Post extends Request
     {
         $value = $this->getData($key, $force);
         if (is_null($value)) return 0;
+        if (preg_match('/^\[.+\]$/', $value)) $value = json_decode($value, true);
         if (is_array($value)) $value = array_sum($value);
 
         if ($value === '' && $force) $this->recodeError($key);
