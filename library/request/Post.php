@@ -75,17 +75,17 @@ final class Post extends Request
             case 'datetime':
                 return strtotime($value);
             case 'cn':
-                return preg_match('/^[\x{4e00}-\x{9fa5}]+$/u', $value);
+                return preg_match('/^[\x{4e00}-\x{9fa5}]+$/u', strval($value));
             case 'en':
-                return preg_match('/^[a-zA-Z]+$/', $value);
+                return preg_match('/^[a-zA-Z]+$/', strval($value));
             case 'number':
-                return preg_match('/^\d+$/', $value);
+                return preg_match('/^\d+$/', strval($value));
             case 'decimal':
-                return preg_match('/^\d+(\.\d+)?$/', $value);
+                return preg_match('/^\d+(\.\d+)?$/', strval($value));
             case 'alphanumeric':
-                return preg_match('/^[a-zA-Z0-9]+$/', $value);
+                return preg_match('/^[a-zA-Z0-9]+$/', strval($value));
             default:
-                if (is_match($type)) return preg_match($type, $value);
+                if (is_match($type)) return preg_match($type, strval($value));
         }
         return false;
     }
@@ -210,7 +210,7 @@ final class Post extends Request
     {
         $value = $this->getData($key, $force);
         if (is_null($value)) return '';
-        if (!preg_match('/^\d+$/', $value)) $this->recodeError($key, "必须为全数字");
+        if (!preg_match('/^\d+$/', strval($value))) $this->recodeError($key, "必须为全数字");
         return strval($value);
     }
 
@@ -218,7 +218,7 @@ final class Post extends Request
     {
         $value = $this->getData($key, $force);
         if (is_null($value)) return 0;
-        if (preg_match('/^\[.+\]$/', $value)) $value = json_decode($value, true);
+        if (preg_match('/^\[.+\]$/', strval($value))) $value = json_decode($value, true);
         if (is_array($value)) $value = array_sum($value);
 
         if ($value === '' && $force) $this->recodeError($key);
@@ -276,7 +276,7 @@ final class Post extends Request
         if (is_null($value)) return '';
         if (empty($value) && $force) $this->recodeError($key);
 
-        if (!preg_match($pnt, $value)) {
+        if (!preg_match($pnt, strval($value))) {
             if ($force) $this->recodeError($key, "不是指定格式的数据");
             return '';
         }
@@ -303,7 +303,7 @@ final class Post extends Request
 
         if (empty($value) && $force) $this->recodeError($key);
 
-        if (!preg_match('/^[\{\[].+[\]\}]$/', $value)) {
+        if (!preg_match('/^[\{\[].+[\]\}]$/', strval($value))) {
             if ($force) $this->recodeError($key, "不是有效的JSON格式");
             return '';
         }
@@ -329,7 +329,7 @@ final class Post extends Request
         if (is_array($value)) $value = xml_encode($root, $value, false);
         if (empty($value) && $force) $this->recodeError($key);
 
-        if (!preg_match('/^<\w+>.+<\/\w+>$/', $value)) {
+        if (!preg_match('/^<\w+>.+<\/\w+>$/', strval($value))) {
             if ($force) $this->recodeError($key, "不是有效的XML格式");
             return '';
         }
