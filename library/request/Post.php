@@ -49,6 +49,8 @@ final class Post extends Request
 
     private function checkString(string $type, $value)
     {
+        if (is_array($value)) return false;
+
         switch ($type) {
             case 'mobile':
                 return is_mob($value);
@@ -218,7 +220,7 @@ final class Post extends Request
     {
         $value = $this->getData($key, $force);
         if (is_null($value)) return 0;
-        if (preg_match('/^\[.+\]$/', strval($value))) $value = json_decode($value, true);
+        if (is_string($value) and preg_match('/^\[.+\]$/', $value)) $value = json_decode($value, true);
         if (is_array($value)) $value = array_sum($value);
 
         if ($value === '' && $force) $this->recodeError($key);
