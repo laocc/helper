@@ -127,9 +127,10 @@ function save_file(string $file, $content, bool $append = false, array $trace = 
  */
 function locked(string $lockKey, callable $callable, ...$args)
 {
-    $operation = ($lockKey[0] === '#') ? (LOCK_EX | LOCK_NB) : LOCK_EX;
+    $option = intval($lockKey[0]);
+    $operation = ($option & 1) ? (LOCK_EX | LOCK_NB) : LOCK_EX;
     $lockKey = str_replace(['/', '\\', '*', '"', "'", '<', '>', ':', ';', '?'], '', $lockKey);
-    if (_CLI) $lockKey = '_CLI_' . $lockKey;
+    if (_CLI) $lockKey = $lockKey . '_CLI_';
     $fn = fopen(($lockFile = "/tmp/{$lockKey}.flock"), 'a');
     if (flock($fn, $operation)) {//加锁
         try {
@@ -144,8 +145,7 @@ function locked(string $lockKey, callable $callable, ...$args)
         $rest = "locked: Running";
     }
     fclose($fn);
-    $retain = ($lockKey[-1] === '%');
-    if (!$retain and is_readable($lockFile)) @unlink($lockFile);
+    if (!($option & 2) and is_readable($lockFile)) @unlink($lockFile);
     return $rest;
 }
 
@@ -174,7 +174,7 @@ function mk_dir(string $path, int $mode = 0744, array $trace = null): bool
         throw new Error("目录或文件名中必须要含有/号，当前path=" . var_export($path, true));
     } else if ($check !== '/') $path = dirname($path);
 
-    return locked('mkdir%', function ($path, $mode) {
+    return locked('2mkdir', function ($path, $mode) {
         if (!file_exists($path)) @mkdir($path, $mode ?: 0740, true);
         return true;
     }, $path, $mode);
