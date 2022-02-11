@@ -129,6 +129,7 @@ function locked(string $lockKey, callable $callable, ...$args)
 {
     $operation = ($lockKey[0] === '#') ? (LOCK_EX | LOCK_NB) : LOCK_EX;
     $lockKey = str_replace(['/', '\\', '*', '"', "'", '<', '>', ':', ';', '?'], '', $lockKey);
+    if (_CLI) $lockKey = '_CLI_' . $lockKey;
     $fn = fopen(($lockFile = "/tmp/{$lockKey}.flock"), 'a');
     if (flock($fn, $operation)) {//加锁
         try {
