@@ -143,7 +143,8 @@ function locked(string $lockKey, callable $callable, ...$args)
         $rest = "locked: Running";
     }
     fclose($fn);
-    if (is_readable($lockFile)) @unlink($lockFile);
+    $retain = ($lockKey[-1] === '%');
+    if (!$retain and is_readable($lockFile)) @unlink($lockFile);
     return $rest;
 }
 
@@ -172,7 +173,7 @@ function mk_dir(string $path, int $mode = 0744, array $trace = null): bool
         throw new Error("目录或文件名中必须要含有/号，当前path=" . var_export($path, true));
     } else if ($check !== '/') $path = dirname($path);
 
-    return locked('mkdir', function ($path, $mode) {
+    return locked('mkdir%', function ($path, $mode) {
         if (!file_exists($path)) @mkdir($path, $mode ?: 0740, true);
         return true;
     }, $path, $mode);
