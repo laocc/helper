@@ -36,7 +36,7 @@ final class Jump
             'e' => $extend,
             's' => $sign,
         ];
-        return urlencode(base64_encode(json_encode($data, 256 | 64)));
+        return urlencode(base64_encode(json_encode($data, 320)));
     }
 
 
@@ -47,7 +47,12 @@ final class Jump
         $json = base64_decode($str);
         if (!$json) return 'fail base';
         $data = json_decode($json, true);
-        if (!$data) return 'fail json';
+        if (!$data) {
+            $json = base64_decode($code);
+            if (!$json) return 'fail base';
+            $data = json_decode($json, true);
+            if (!$data) return 'fail json';
+        }
         if (!isset($data['u']) or !isset($data['n']) or !isset($data['s'])) return 'no uns';
         $time = time();
         $sign = md5(date('YmdHi', $time) . $data['u'] . $this->token . $data['n'] . ($data['e'] ?? ''));
