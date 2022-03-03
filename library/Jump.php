@@ -36,24 +36,29 @@ final class Jump
             'e' => $extend,
             's' => $sign,
         ];
-        return urlencode(base64_encode(json_encode($data, 256 | 64)));
+        return urlencode(base64_encode(json_encode($data, 320)));
     }
 
 
-    public function decode(string $code): array
+    public function decode(string $code)
     {
         $str = urldecode($code);
-        if (!$str) return [];
+        if (!$str) return 'empty url';
         $json = base64_decode($str);
-        if (!$json) return [];
+        if (!$json) return 'fail base';
         $data = json_decode($json, true);
-        if (!$data) return [];
-        if (!isset($data['u']) or !isset($data['n']) or !isset($data['s'])) return [];
+        if (!$data) {
+            $json = base64_decode($code);
+            if (!$json) return 'fail base';
+            $data = json_decode($json, true);
+            if (!$data) return 'fail json';
+        }
+        if (!isset($data['u']) or !isset($data['n']) or !isset($data['s'])) return 'no uns';
         $time = time();
         $sign = md5(date('YmdHi', $time) . $data['u'] . $this->token . $data['n'] . ($data['e'] ?? ''));
         if ($sign !== $data['s']) {
             $sign = md5(date('YmdHi', $time - 1) . $data['u'] . $this->token . $data['n'] . ($data['e'] ?? ''));
-            if ($sign !== $data['s']) return [];
+            if ($sign !== $data['s']) return 'token error';
         }
         $ext = unserialize($data['e'] ?? '');
         return ['id' => $data['u'], 'name' => $data['n'], 'extend' => $ext];
