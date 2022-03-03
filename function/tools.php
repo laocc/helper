@@ -628,9 +628,9 @@ function re_size(string $size): int
  */
 function data_size(int $byte, int $x = 2): string
 {
-    $k = 4;
+    $k = 5;
     while ($k--) if ($byte > pow(1024, $k)) break;
-    return round($byte / pow(1024, $k), $x) . ['B', 'KB', 'MB', 'TB'][$k];
+    return sprintf("%.{$x}f", $byte / pow(1024, $k)) . ['B', 'KB', 'MB', 'GB', 'TB'][$k];
 }
 
 
