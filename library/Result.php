@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace esp\helper\library;
 
-use esp\core\ext\Paging;
+use esp\dbs\library\Paging;
 
 /**
  * ajax/post中返回数据的封装
