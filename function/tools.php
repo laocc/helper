@@ -662,6 +662,37 @@ function pre(...$str)
 
 
 /**
+ * 查询服务器磁盘
+ *
+ * @return array[]
+ */
+function disk_size(array $disk)
+{
+    $fp = popen('df -h', "r");
+    $size = '未知';
+    if (empty($disk)) return [[0 => '未指定磁盘']];
+//        $disk = [
+//        'a' => '/dev/vda1',
+//        'b' => '/dev/vdb',
+//        'c' => '/dev/vdc'
+//    ];
+    $value = $disk;
+    while (!feof($fp)) {
+        $item = fgets($fp, 4096);
+        foreach ($disk as $d => $p) {
+            if (strpos($item, $p) === 0) {
+                preg_match('/([\d\.]+[GM])\s+([\d\.]+[GM])\s+([\d\.]+[GM])\s+([\d\.]+)\%/', $item, $size);
+                $size[4] = intval($size[4]);
+                $value[$d] = $size;
+            }
+        }
+    }
+    pclose($fp);
+    return $value;
+}
+
+
+/**
  * CLI环境中打印彩色字
  * @param $text
  * @param string|null $bgColor
