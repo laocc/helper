@@ -19,6 +19,8 @@ class Result
     private $_data = [];
     private $_pageValue = null;
     private $_append = [];
+    private $_update = [];
+
     /**
      * @var Paging $_paging
      */
@@ -120,6 +122,19 @@ class Result
             $this->_data = $key;
 
         }
+        return $this;
+    }
+
+    public function update(string $key, array $value): Result
+    {
+        $this->_update[$key] = $value;
+        $this->append('update', $this->_update);
+        return $this;
+    }
+
+    public function action(string $action): Result
+    {
+        $this->append('action', $action);
         return $this;
     }
 
