@@ -125,7 +125,7 @@ class Result
         return $this;
     }
 
-    public function update(string $key, array $value): Result
+    public function update(string $key, $value): Result
     {
         $this->_update[$key] = $value;
         $this->append('update', $this->_update);
