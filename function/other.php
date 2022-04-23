@@ -40,8 +40,8 @@ function image_type(string $ext): int
     $file['psd'] = IMAGETYPE_PSD;
     $file['bmp'] = IMAGETYPE_BMP;
     $file['wbmp'] = IMAGETYPE_WBMP;
-    $file['bmp'] = IMAGETYPE_XBM;
-    return isset($file[$ext]) ? $file[$ext] : 0;
+    $file['bmpx'] = IMAGETYPE_XBM;
+    return $file[$ext] ?? 0;
 }
 
 

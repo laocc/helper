@@ -853,4 +853,21 @@ function _table(array $data)
     }
 }
 
-
+/**
+ * 字串中所有字符大小写互换
+ *
+ * @param string $str
+ * @return string
+ */
+function ucase_lcase(string $str): string
+{
+    if (empty($str)) return '';
+    $char = [];
+    foreach (str_split($str) as $a) {
+        $o = ord($a);
+        if ($o > 64 and $o < 91) $char[] = chr($o + 32);
+        else if ($o > 96 and $o < 123) $char[] = chr($o - 32);
+        else $char[] = $a;
+    }
+    return implode($char);
+}
