@@ -458,10 +458,10 @@ function str_cut(string $str): array
 /**
  * 将字符串大小写对换，只能用于纯英文半角
  *
- * @param $string
+ * @param string $string
  * @return string
  */
-function swap_case($string): string
+function swap_case(string $string): string
 {
     $str = [];
     for ($i = 0; $i < strlen($string); $i++) {
@@ -843,23 +843,4 @@ function _table(array $data)
         if ($index === $len) echo "┛\n";
         else echo "┻";
     }
-}
-
-/**
- * 字串中所有字符大小写互换
- *
- * @param string $str
- * @return string
- */
-function ucase_lcase(string $str): string
-{
-    if (empty($str)) return '';
-    $char = [];
-    foreach (str_split($str) as $a) {
-        $o = ord($a);
-        if ($o > 64 and $o < 91) $char[] = chr($o + 32);
-        else if ($o > 96 and $o < 123) $char[] = chr($o - 32);
-        else $char[] = $a;
-    }
-    return implode($char);
 }
