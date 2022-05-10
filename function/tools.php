@@ -458,10 +458,10 @@ function str_cut(string $str): array
 /**
  * 将字符串大小写对换，只能用于纯英文半角
  *
- * @param $string
+ * @param string $string
  * @return string
  */
-function swap_case($string): string
+function swap_case(string $string): string
 {
     $str = [];
     for ($i = 0; $i < strlen($string); $i++) {
@@ -604,19 +604,10 @@ function unicode_decode(string $code): string
  */
 function re_size(string $size): int
 {
-    return (int)preg_replace_callback('/(\d+)([kmGt])b?/i', function ($matches) {
-        switch (strtolower($matches[2])) {
-            case 'k':
-                return $matches[1] * 1024;
-            case 'm':
-                return $matches[1] * pow(1024, 2);
-            case 'g':
-                return $matches[1] * pow(1024, 3);
-            case 't':
-                return $matches[1] * pow(1024, 4);
-            default:
-                return $matches[1] * 1;
-        }
+    return (int)preg_replace_callback('/(\d+)([kmGtpEzy])b?/i', function ($matches) {
+
+        return floatval($matches[1]) * pow(1024, stripos('.kmGtpEzy', $matches[2]));
+
     }, $size);
 }
 
@@ -628,9 +619,10 @@ function re_size(string $size): int
  */
 function data_size(int $byte, int $x = 2): string
 {
-    $k = 5;
+    if ($byte <= 0) return '0';
+    $k = 9;
     while ($k--) if ($byte > pow(1024, $k)) break;
-    return sprintf("%.{$x}f", $byte / pow(1024, $k)) . ['B', 'KB', 'MB', 'GB', 'TB'][$k];
+    return sprintf("%.{$x}f", $byte / pow(1024, $k)) . ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'][$k];
 }
 
 
@@ -852,5 +844,3 @@ function _table(array $data)
         else echo "┻";
     }
 }
-
-

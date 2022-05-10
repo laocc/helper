@@ -230,6 +230,14 @@ final class Post extends Request
         return $value;
     }
 
+    public function tinyint(string $key, bool $zero = true): int
+    {
+        $value = $this->int($key, $zero);
+        if ($value < 0) $this->recodeError($key, '值不能小于0');
+        else if ($value > 255) $this->recodeError($key, '值最大255');
+        return $value;
+    }
+
     public function float(string $key, bool $zero = true): float
     {
         $value = $this->getData($key, $force);
