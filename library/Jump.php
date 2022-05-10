@@ -36,7 +36,8 @@ final class Jump
             'e' => $extend,
             's' => $sign,
         ];
-        return urlencode(base64_encode(json_encode($data, 320)));
+        $base = base64_encode(json_encode($data, 320));
+        return urlencode(str_replace('/', '_', $base));
     }
 
 
@@ -44,7 +45,7 @@ final class Jump
     {
         $str = urldecode($code);
         if (!$str) return 'empty url';
-        $json = base64_decode($str);
+        $json = base64_decode(str_replace('_', '/', $str));
         if (!$json) return 'fail base';
         $data = json_decode($json, true);
         if (!$data) {
