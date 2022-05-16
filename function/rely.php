@@ -105,7 +105,6 @@ function root(string $path, bool $real = false): string
  * @param bool $append
  * @param array|null $trace
  * @return int
- * @throws Error
  */
 function save_file(string $file, $content, bool $append = false, array $trace = null): int
 {
@@ -164,14 +163,13 @@ function locked(string $lockKey, callable $callable, ...$args)
  * @param int $mode
  * @param array|null $trace
  * @return bool
- * @throws Error
  */
 function mk_dir(string $path, int $mode = 0744, array $trace = null): bool
 {
     if (!$path) return false;
     $check = strrchr($path, '/');
     if ($check === false) {
-        throw new Error("目录或文件名中必须要含有/号，当前path=" . var_export($path, true));
+        throw new \Error("目录或文件名中必须要含有/号，当前path=" . var_export($path, true));
     } else if ($check !== '/') $path = dirname($path);
 
     return locked('2mkdir', function ($path, $mode) {
