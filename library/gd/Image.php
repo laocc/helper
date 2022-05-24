@@ -2,7 +2,7 @@
 
 namespace esp\helper\library\gd;
 
-use esp\helper\library\Error;
+use Error;
 use esp\helper\library\gd\ext\Gd;
 use function esp\helper\mk_dir;
 

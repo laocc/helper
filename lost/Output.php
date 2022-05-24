@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace esp\helper\lost;
 
-use esp\helper\library\Error;
 use function esp\helper\text;
 
 final class Output
@@ -47,11 +46,10 @@ final class Output
      * @param string $uri
      * @param array $rpc
      * @return $this
-     * @throws Error
      */
     public function rpc(string $uri, array $rpc)
     {
-        if (_VIRTUAL === 'rpc') throw new Error('RPC内不能请求rpc', 1);
+        if (_VIRTUAL === 'rpc') throw new \Error('RPC内不能请求rpc', 1);
         $host = ['host' => $rpc['host'], 'port' => $rpc['port'], 'ip' => $rpc['ip']];
         $this->url = sprintf('http://%s:%s/%s', $host['host'], $host['port'], ltrim($uri, '/'));
         $this->option['host'] = [implode(':', $host)];

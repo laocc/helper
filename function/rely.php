@@ -2,7 +2,6 @@
 
 namespace esp\helper;
 
-use esp\helper\library\Error;
 use esp\helper\library\ext\Xml;
 
 /**
@@ -203,7 +202,6 @@ function xml_decode(string $str, bool $toArray = true)
  * @param array $array
  * @param bool $outHead
  * @return string
- * @throws Error
  */
 function xml_encode($root, array $array, bool $outHead = true): string
 {

@@ -2,7 +2,7 @@
 
 namespace esp\helper\library\request;
 
-use esp\helper\library\Error;
+use Error;
 
 abstract class Request
 {

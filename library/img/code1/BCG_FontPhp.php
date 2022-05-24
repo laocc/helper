@@ -2,7 +2,7 @@
 
 namespace esp\helper\library\img\code1;
 
-use esp\helper\library\Error;
+use Error;
 
 final class BCG_FontPhp implements BCG_Font
 {
