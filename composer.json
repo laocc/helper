@@ -10,7 +10,8 @@
   ],
   "require": {
     "php": ">7.1",
-    "ext-json": "*"
+    "ext-json": "*",
+    "phpoffice/phpexcel": "^1.8"
   },
   "autoload": {
     "files": [
