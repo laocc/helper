@@ -23,6 +23,7 @@
     ],
     "psr-4": {
       "esp\\helper\\library\\": "library/",
+      "esp\\helper\\excel\\": "excel/",
       "esp\\helper\\password\\": "password/"
     }
   }
