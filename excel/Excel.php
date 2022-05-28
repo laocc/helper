@@ -91,22 +91,33 @@ class Excel
         if (!$charset) $charset = 'utf8mb4';//utf8,gb2312
         foreach ($tables as $sheet) {
             foreach ($sheet as $table) {
-                $drop = "TABLE IF EXISTS `{$table['table']}`;";
+                switch ($table['action']) {
+                    case 'skip':
+                    case 'lock':
+                        continue;
+                        break;
+                    case 'update':
 
-                $fields = [];
-                foreach ($table['fields'] as $fid) {
-                    $fields[] = "{$fid['name']} {$fid['type']} COMMENT '{$fid['label']} {$fid['notes']}'";
+                        break;
+                    default:
+                        $drop = "TABLE IF EXISTS `{$table['table']}`;";
+
+                        $fields = [];
+                        foreach ($table['fields'] as $fid) {
+                            $fields[] = "{$fid['name']} {$fid['type']} COMMENT '{$fid['label']} {$fid['notes']}'";
+                        }
+                        $fields[] = "primary key({$table['primary']})";
+                        foreach ($table['keys'] as $key) {
+                            $fields[] = "key {$key} ({$key})";
+                        }
+                        foreach ($table['spatial'] as $key) {
+                            $fields[] = "Spatial Index {$key} ({$key})";
+                        }
+                        $build = "TABLE IF NOT EXISTS `{$table['table']}` (%s) ENGINE={$engine} DEFAULT CHARSET={$charset} COMMENT='{$table['label']}';";
+                        $build = sprintf($build, implode(', ', $fields));
+                        $sqlAll[] = "DROP {$drop} CREATE {$build}";
                 }
-                $fields[] = "primary key({$table['primary']})";
-                foreach ($table['keys'] as $key) {
-                    $fields[] = "key {$key} ({$key})";
-                }
-                foreach ($table['spatial'] as $key) {
-                    $fields[] = "Spatial Index {$key} ({$key})";
-                }
-                $build = "TABLE IF NOT EXISTS `{$table['table']}` (%s) ENGINE={$engine} DEFAULT CHARSET={$charset} COMMENT='{$table['label']}';";
-                $build = sprintf($build, implode(', ', $fields));
-                $sqlAll[] = "DROP {$drop} CREATE {$build}";
+
             }
         }
         return $sqlAll;
@@ -156,15 +167,20 @@ class Excel
                     $table = [
                         'table' => $rs,
                         'label' => $sheet->getCell(chr($column + 3) . $row)->getValue(),
+                        'action' => 'create',
                         'fields' => [],
                         'keys' => [],
                         'spatial' => [],
                     ];
                     break;
                 }
+
                 switch ($rowIndex) {
                     case 0:
                         $table['fields'][$tabRow]['key'] = $rs;
+                        if (in_array($rs, ['skip', 'update', 'lock'])) {
+                            $table['action'] = $rs;
+                        }
                         break;
                     case 1:
                         $table['fields'][$tabRow]['name'] = $rs;
