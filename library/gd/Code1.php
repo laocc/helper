@@ -31,7 +31,7 @@ class Code1
         if (!is_array($option)) {
             $option = ['value' => $option];
         }
-        $code = Array();
+        $code = array();
         $code['code'] = microtime(true);        //条码内容
         $code['font'] = null;       //字体，若不指定，则用PHP默认字体
         $code['size'] = 10;         //字体大小
@@ -94,7 +94,9 @@ class Code1
             'type' => IMAGETYPE_PNG,//文件类型
         ];
 
-        Gd::draw($im, $option);
+        $ds = Gd::draw($im, $option);
+        if ($option["save"] === 3) return $ds;
+
         return $file;
     }
 }
