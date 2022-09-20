@@ -119,6 +119,8 @@ function date_diffs(int $timeA, int $timeB): string
         } else {
             return intval($time / 3660) . '小时' . intval(($time % 3600) / 60) . '分';
         }
+    } else if ($time > 2592000) {
+        return intval($time / 86400) . '天';
     } else {
         return intval($time / 86400) . '天' . intval(($time % 86400) / 3600) . '小时';
     }
@@ -133,7 +135,7 @@ function date_diffs(int $timeA, int $timeB): string
  */
 function date_friendly(int $timestamp, $time_now = null): string
 {
-    $time=time();
+    $time = time();
     $Q = $timestamp > $time ? '后' : '前';
     $V = $T = $dt = null;
     $S = abs((($time_now ?: $time) - $timestamp) ?: 1) and $V = 'S' and $T = '秒';
