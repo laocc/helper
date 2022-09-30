@@ -278,7 +278,7 @@ CSS;
                 continue;
             }
 
-            //调用函数 [    0.0064     454960         -> define(string(3), long) /home/web/blog/public/bootstrap.php:12]
+            //调用函数 [    0.0064     454960         -> get(string(3), long) /home/web/blog/public/bootstrap.php:12]
             if (preg_match('/^(?<len>\s+(?<tim>\d+\.\d+)\s+(?<mem>\d+))(?<lv>\s+)\-\>(?<fun>.+)\s+(?<file>.+?)\:(?<line>\d+)\s*$/i', $row, $mac)) {
 
                 if ($mac['file'] == $this->_skip or stripos($mac['file'], $this->_skip)) continue;
