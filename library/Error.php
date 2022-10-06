@@ -40,7 +40,7 @@ class Error extends \ErrorException
 
     public function display(): array
     {
-        $err = array();
+        $err = [];
         $err['success'] = 0;
         $err['error'] = $this->getCode();
         $err['message'] = $this->getMessage();

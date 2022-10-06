@@ -12,9 +12,9 @@ namespace esp\helper\library;
  */
 class Lunar
 {
-    private $MIN_YEAR = 1891;
-    private $MAX_YEAR = 2100;
-    private $lunarInfo = array(
+    private int $MIN_YEAR = 1891;
+    private int $MAX_YEAR = 2100;
+    private array $lunarInfo = array(
         array(0, 2, 9, 21936), array(6, 1, 30, 9656), array(0, 2, 17, 9584), array(0, 2, 6, 21168), array(5, 1, 26, 43344), array(0, 2, 13, 59728),
         array(0, 2, 2, 27296), array(3, 1, 22, 44368), array(0, 2, 10, 43856), array(8, 1, 30, 19304), array(0, 2, 19, 19168), array(0, 2, 8, 42352),
         array(5, 1, 29, 21096), array(0, 2, 16, 53856), array(0, 2, 4, 55632), array(4, 1, 25, 27304), array(0, 2, 13, 22176), array(0, 2, 2, 39632),
@@ -56,7 +56,7 @@ class Lunar
     public function __construct()
     {
         $this->value = new class {
-            private $_value = [];
+            private array $_value = [];
 
             public function set(string $key, $value)
             {
@@ -143,7 +143,7 @@ class Lunar
         $sky = array('庚', '辛', '壬', '癸', '甲', '乙', '丙', '丁', '戊', '己');
         $earth = array('申', '酉', '戌', '亥', '子', '丑', '寅', '卯', '辰', '巳', '午', '未');
         $year = $year . '';
-        return $sky[$year{3}] . $earth[$year % 12] . '年';
+        return $sky[$year[3]] . $earth[$year % 12] . '年';
     }
 
     /**
@@ -212,10 +212,10 @@ class Lunar
      */
     private function getLunarYearDays(int $year)
     {
-        $yearData = $this->lunarInfo[$year - $this->MIN_YEAR];
-        $monthArray = $this->getLunarYearMonths($year);
-        $len = count($monthArray);
-        return ($monthArray[$len - 1] == 0 ? $monthArray[$len - 2] : $monthArray[$len - 1]);
+//        $yearData = $this->lunarInfo[$year - $this->MIN_YEAR];
+        $ym = $this->getLunarYearMonths($year);
+        $len = count($ym);
+        return ($ym[$len - 1] == 0 ? $ym[$len - 2] : $ym[$len - 1]);
     }
 
     /**
@@ -233,7 +233,7 @@ class Lunar
             for ($j = 0; $j <= $i; $j++) {
                 $temp += $monthData[$j];
             }
-            array_push($res, $temp);
+            $res[] = $temp;
         }
         return $res;
     }

@@ -12,20 +12,17 @@ namespace esp\helper\library;
  */
 class Result
 {
-    private $_success = true;
-    private $_error = 0;
-    private $_message = 'ok';
-    private $_token = '';
-    private $_data = [];
-    private $_pageValue = null;
-    private $_append = [];
-    private $_update = [];
+    private int $_success = 1;
+    private int $_error = 0;
+    private string $_message = 'ok';
+    private string $_token = '';
+    private array $_data = [];
+    private array $_pageValue = [];
+    private array $_append = [];
+    private array $_update = [];
 
-    /**
-     * @var Paging $_paging
-     */
-    private $_paging = null;
-    private $_error_value = array();
+    private Paging $_paging;
+    private array $_error_value = array();
 
     public function __construct(string $token = __FILE__)
     {
@@ -56,7 +53,7 @@ class Result
      */
     public function success($value = true): Result
     {
-        $this->_success = $value;
+        $this->_success = intval($value);
         return $this;
     }
 
@@ -127,7 +124,11 @@ class Result
 
     public function update(string $key, $value): Result
     {
-        $this->_update[$key] = $value;
+        if (is_null($value)) {
+            unset($this->_update[$key]);
+        } else {
+            $this->_update[$key] = $value;
+        }
         $this->append('update', $this->_update);
         return $this;
     }
@@ -180,8 +181,8 @@ class Result
         ];
         $value['_sign'] = md5(json_encode($value, 256 | 64) . $this->_token);
 
-        if (!is_null($this->_pageValue)) $value['paging'] = $this->_pageValue;
-        else if (!is_null($this->_paging)) $value['paging'] = $this->_paging->value();
+        if (isset($this->_pageValue)) $value['paging'] = $this->_pageValue;
+        else if (isset($this->_paging)) $value['paging'] = $this->_paging->value();
 
         if (!empty($this->_append)) $value += $this->_append;
 
