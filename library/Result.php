@@ -17,12 +17,12 @@ class Result
     private string $_message = 'ok';
     private string $_token = '';
     private array $_data = [];
-    private array $_pageValue = [];
     private array $_append = [];
     private array $_update = [];
+    private array $_error_value = [];
 
+    private array $_pageValue;
     private Paging $_paging;
-    private array $_error_value = array();
 
     public function __construct(string $token = __FILE__)
     {
