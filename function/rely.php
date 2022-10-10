@@ -90,12 +90,23 @@ function root(string $path, bool $real = false): string
         if (strpos($path, $r) === 0) goto end;
     }
 
-    if (stripos($path, _ROOT) !== 0) $path = _ROOT . "/" . trim($path, '/');
+    if (strpos($path, _ROOT) !== 0) $path = _ROOT . "/" . trim($path, '/');
     end:
     if ($real) $path = realpath($path);
     if ($path === false) return '';
     return rtrim($path, '/');
 }
+
+/**
+ * 查询是否在ROOT目录中，不检查目录是否存在，仅检查字串是否以ROOT开头
+ * @param string $path
+ * @return bool
+ */
+function in_root(string $path): bool
+{
+    return strpos($path, _ROOT) === 0;
+}
+
 
 /**
  * 储存文件
