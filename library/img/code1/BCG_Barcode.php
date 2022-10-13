@@ -2,7 +2,7 @@
 
 namespace esp\helper\library\img\code1;
 
-use Error;
+use esp\error\Error;
 
 abstract class BCG_Barcode
 {

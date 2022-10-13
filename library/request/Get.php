@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace esp\helper\library\request;
 
-use Error;
+use esp\error\Error;
 use esp\helper\library\ext\Xss;
 use function esp\helper\is_card;
 use function esp\helper\is_date;

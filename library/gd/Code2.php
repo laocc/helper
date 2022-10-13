@@ -2,7 +2,7 @@
 
 namespace esp\helper\library\gd;
 
-use Error;
+use esp\error\Error;
 use esp\helper\library\gd\ext\Gd;
 
 /**

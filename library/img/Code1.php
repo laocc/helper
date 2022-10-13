@@ -2,7 +2,7 @@
 
 namespace esp\helper\library\img;
 
-use Error;
+use esp\error\Error;
 use esp\helper\library\img\code1\BCG_FontFile;
 use esp\helper\library\img\code1\BCG_code128;
 use esp\helper\library\img\code1\BCG_Color;
