@@ -2,6 +2,8 @@
 
 namespace esp\helper;
 
+use esp\error\Error;
+
 /**
  * 显示某个错误状态信息
  *
@@ -95,7 +97,7 @@ HTML;
  */
 function moveTransfer(string $path, bool $show = true)
 {
-    if (!_CLI) throw new \Error('moveTransfer只能运行于CLI环境');
+    if (!_CLI) throw new Error('moveTransfer只能运行于CLI环境');
     $time = 0;
     reMove:
     $time++;
@@ -118,7 +120,7 @@ function moveTransfer(string $path, bool $show = true)
             }
             mk_dir($move);
             rename("{$path}/{$file}", $move);
-        } catch (\Error $e) {
+        } catch (Error $e) {
             print_r(['moveTransfer' => $e]);
         }
     }
@@ -232,7 +234,7 @@ function img_base64(string $file, bool $split = false): string
  * @param string $base64Code
  * @param string|null $fileName 不带名时为直接输出
  * @return bool
- * @throws library\Error
+ * @throws Error
  */
 function base64_img(string $base64Code, string $fileName = null)
 {

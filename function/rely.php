@@ -2,6 +2,7 @@
 
 namespace esp\helper;
 
+use esp\error\Error;
 use esp\helper\library\ext\Xml;
 
 /**
@@ -146,7 +147,7 @@ function locked(string $lockKey, callable $callable, ...$args)
             $rest = $callable(...$args);//执行
         } catch (\Exception $exception) {
             $rest = 'locked: ' . $exception->getMessage();
-        } catch (\Error $error) {
+        } catch (Error $error) {
             $rest = 'locked: ' . $error->getMessage();
         }
         flock($fn, LOCK_UN);//解锁
@@ -179,7 +180,7 @@ function mk_dir(string $path, int $mode = 0744, array $trace = null): bool
     if (!$path) return false;
     $check = strrchr($path, '/');
     if ($check === false) {
-        throw new \Error("目录或文件名中必须要含有/号，当前path=" . var_export($path, true));
+        throw new Error("目录或文件名中必须要含有/号，当前path=" . var_export($path, true));
     } else if ($check !== '/') $path = dirname($path);
 
     return locked('2mkdir', function ($path, $mode) {
