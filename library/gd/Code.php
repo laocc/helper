@@ -122,20 +122,14 @@ class Code
             $addContent = strtoupper($opt['attach'] . implode($code));//附加串，有效期最长1小时
             $enCode = password_hash($addContent, PASSWORD_DEFAULT);
             //输出之前先保存Cookies
-
-            if (version_compare(PHP_VERSION, '7.3', '>')) {
-                $cok = [];
-                $cok['domain'] = _DOMAIN;
-                $cok['expires'] = 0;
-                $cok['path'] = '/';
-                $cok['secure'] = _HTTPS;//仅https
-                $cok['httponly'] = true;
-                $cok['samesite'] = 'Lax';
-                setcookie(strtolower($opt['key'] . $option['source']), $enCode, $cok);
-            } else {
-                setcookie(strtolower($opt['key'] . $option['source']), $enCode, 0, '/', _DOMAIN, _HTTPS, true);
-            }
-
+            $cok = [];
+            $cok['domain'] = _DOMAIN;
+            $cok['expires'] = 0;
+            $cok['path'] = '/';
+            $cok['secure'] = _HTTPS;//仅https
+            $cok['httponly'] = true;
+            $cok['samesite'] = 'Lax';
+            setcookie(strtolower($opt['key'] . $option['source']), $enCode, $cok);
         }
         return Gd::draw($img, []);
     }
@@ -155,18 +149,14 @@ class Code
         $key = strtolower("{$ck['key']}{$option['source']}");
         if (!$cookies = $_COOKIE[$key] ?? null) return false;
         $addContent = strtoupper("{$ck['attach']}{$input}");
-        if (version_compare(PHP_VERSION, '7.3', '>')) {
-            $cok = [];
-            $cok['domain'] = _DOMAIN;
-            $cok['expires'] = -1;
-            $cok['path'] = '/';
-            $cok['secure'] = _HTTPS;//仅https
-            $cok['httponly'] = true;
-            $cok['samesite'] = 'Lax';
-            setcookie($key, null, $cok);
-        } else {
-            setcookie($key, null, -1, '/', _DOMAIN, _HTTPS, true);
-        }
+        $cok = [];
+        $cok['domain'] = _DOMAIN;
+        $cok['expires'] = -1;
+        $cok['path'] = '/';
+        $cok['secure'] = _HTTPS;//仅https
+        $cok['httponly'] = true;
+        $cok['samesite'] = 'Lax';
+        setcookie($key, null, $cok);
         return password_verify($addContent, $cookies);
     }
 
