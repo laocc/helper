@@ -29,6 +29,12 @@ class Result
         $this->_token = $token;
     }
 
+    public function setToken($token = null): Result
+    {
+        $this->_token = $token;
+        return $this;
+    }
+
     public function setError(array $error): Result
     {
         $this->_error_value = $error;
@@ -170,7 +176,7 @@ class Result
     public function display($return = null): array
     {
         if ($return instanceof Result) return $return->display();
-        if (is_array($return) and isset($return['_sign']) and isset($return['_time'])) return $return;
+        if (is_array($return) and (isset($return['_sign']) or isset($return['_time']))) return $return;
 
         $value = [
             'success' => $this->_success,
@@ -179,7 +185,7 @@ class Result
             'data' => $this->_data,
             '_time' => microtime(true),
         ];
-        $value['_sign'] = md5(json_encode($value, 256 | 64) . $this->_token);
+        if ($this->_token) $value['_sign'] = md5(json_encode($value, 256 | 64) . $this->_token);
 
         if (isset($this->_pageValue)) $value['paging'] = $this->_pageValue;
         else if (isset($this->_paging)) $value['paging'] = $this->_paging->value();
