@@ -11,8 +11,7 @@
   "require": {
     "php": ">7.4.0",
     "ext-json": "*",
-    "ext-xmlwriter": "*",
-    "phpoffice/phpexcel": "^1.8"
+    "ext-xmlwriter": "*"
   },
   "autoload": {
     "files": [

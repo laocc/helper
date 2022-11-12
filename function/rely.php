@@ -174,6 +174,7 @@ function locked(string $lockKey, callable $callable, ...$args)
  * @param int $mode
  * @param array|null $trace
  * @return bool
+ * @throws Error
  */
 function mk_dir(string $path, int $mode = 0744, array $trace = null): bool
 {
