@@ -156,7 +156,7 @@ class Code
         $cok['secure'] = _HTTPS;//仅https
         $cok['httponly'] = true;
         $cok['samesite'] = 'Lax';
-        setcookie($key, null, $cok);
+        setcookie($key, '', $cok);
         return password_verify($addContent, $cookies);
     }
 
