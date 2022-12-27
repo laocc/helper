@@ -6,14 +6,13 @@ use esp\error\Error;
 
 abstract class Request
 {
-    protected $_isPost = false;
-    protected $_data = array();
-    protected $_raw = '';
-    protected $_error = [];
-    protected $_off = false;
-    protected $_min;
-    protected $_max;
-
+    protected bool $_isPost = false;
+    protected array $_data = array();
+    protected string $_raw = '';
+    protected array $_error = [];
+    protected bool $_off = false;
+    protected $_min = PHP_INT_MIN;
+    protected $_max = PHP_INT_MAX;
 
     /**
      * 数字类：表示最大最小值
@@ -54,11 +53,11 @@ abstract class Request
         $min = $this->_min;
         $max = $this->_max;
         if ($type === 1) {
-            $min = strtotime($min);
-            $max = strtotime($max);
+            $min = strtotime(strval($min));
+            $max = strtotime(strval($max));
         } else if ($type === 2) {
-            $min = intval($min * 100);
-            $max = intval($max * 100);
+            $min = intval(floatval($min) * 100);
+            $max = intval(floatval($max) * 100);
         }
 
         if (!is_null($this->_min) && $min > $number) {
