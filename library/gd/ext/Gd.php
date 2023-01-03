@@ -3,6 +3,8 @@
 namespace esp\helper\library\gd\ext;
 
 
+use GdImage;
+
 class Gd
 {
     const identifiers = [
@@ -286,7 +288,7 @@ class Gd
      * @param $color
      * @return resource
      */
-    public static function createCircle($w, $h = 0, $color, $radius)
+    public static function createCircle($w, $h, $color, $radius)
     {
         $h = $h ?: $w;
         $im = imagecreate($w, $h);
@@ -317,10 +319,9 @@ class Gd
      * @param int $h
      * @param $color
      * @param int $radius 倒角半径
-     * @param int $border倒角半径
-     * @return resource
+     * @return false|GdImage|resource
      */
-    public static function createRectangle($w, $h = 0, $color, $radius = 0)
+    public static function createRectangle($w, $h, $color, $radius = 0)
     {
         $h = $h ?: $w;
         $im = imagecreate($w, $h);
