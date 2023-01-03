@@ -1643,7 +1643,7 @@ final class BCG_code128 extends BCG_Barcode1D
             $this->text = $text;
         } else {
             reset($text);
-            while (list($key1, $val1) = each($text)) {            // We take each value
+            foreach ($text as $key1 => $val1) {            // We take each value
                 if (!is_array($val1)) {                    // This is not a table
                     if (is_string($val1)) {                // If it's a string, parse as unknown
                         $seq .= $this->getSequence($val1, $currentMode);
@@ -1651,14 +1651,15 @@ final class BCG_code128 extends BCG_Barcode1D
                     } else {
                         // it's the case of "array(ENCODING, 'text')"
                         // We got ENCODING in $val1, calling 'each' again will get 'text' in $val2
-                        list($key2, $val2) = each($text);
+//                        list($key2, $val2) = each($text);
+                        $val2 = next($text);
                         $seq .= $this->{'setParse' . $this->METHOD[$val1]}($val2, $currentMode);
                         $this->text .= $val2;
                     }
                 } else {                        // The method is specified
                     // $val1[0] = ENCODING
                     // $val1[1] = 'text'
-                    $value = isset($val1[1]) ? $val1[1] : '';    // If data available
+                    $value = $val1[1] ?? '';    // If data available
                     $seq .= $this->{'setParse' . $this->METHOD[$val1[0]]}($value, $currentMode);
                     $this->text .= $value;
                 }

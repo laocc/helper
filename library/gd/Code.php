@@ -57,7 +57,7 @@ use esp\helper\library\gd\ext\Gd;
  */
 class Code
 {
-    private static $option = [
+    private static array $option = [
         'charset' => 'en',      //使用中文或英文验证码，cn=中文，en=英文，num=数字，若create()指定了，则以指定的为准
         'length' => [3, 5],     //验证码长度范围
         'size' => [150, 50],    //宽度，高度
@@ -86,7 +86,7 @@ class Code
     ];
 
     //中英文验证码字库，不要含有容易混淆的字符，如0和o。
-    private static $disc = [
+    private static array $disc = [
         'en' => 'AaBbCcDdEeFfGgHhJKkMmNnPpRqRSsTtUuVvWwXxYyZz23456789',//不含[01IijLlOor]容易混淆的字符
         'cn' => '我国首次火星探测任务经中央批准立项火星探测是我国深空探测继探月工程之后的重要创举是又项国家重大标志性工程为扩大工程的社会影响树立工程的文化形象激发全国人民和海外同胞的爱国热情探月与航工程中心会同有关部门和单位组织中国火星探测工程名称和图形标识全球征集活动',
         'num' => '0123456789'

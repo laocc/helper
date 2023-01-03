@@ -23,7 +23,7 @@ class Image
 {
     const Quality = 80;    //JPG默认质量，对所有方法都有效
 
-    static private $backup = array();
+    static private array $backup = array();
     static private $pattern;
 
     /**

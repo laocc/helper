@@ -479,9 +479,7 @@ class qr_Spec
 
     /** --------------------------------------------------------------------
      * Put a finder pattern.
-     * @param frame
-     * @param width
-     * @param ox ,oy upper-left coordinate of the pattern
+     * ox,oy upper-left coordinate of the pattern
      */
     public static function putFinderPattern(&$frame, $ox, $oy)
     {
@@ -1871,14 +1869,13 @@ class qr_Rs
             if ($rs->gfpoly != $gfpoly) continue;
             if ($rs->fcr != $fcr) continue;
             if ($rs->prim != $prim) continue;
-
             return $rs;
         }
 
-        $rs = qr_RsItem::init_rs_char($symsize, $gfpoly, $fcr, $prim, $nroots, $pad);
-        array_unshift(self::$items, $rs);
+        $rsv = qr_RsItem::init_rs_char($symsize, $gfpoly, $fcr, $prim, $nroots, $pad);
+        array_unshift(self::$items, $rsv);
 
-        return $rs;
+        return $rsv;
     }
 }
 
@@ -2330,7 +2327,7 @@ class qr_Image
      * @param $option
      * @return resource
      */
-    public function image(array $frame, $pixelPerPoint = 4, $option)
+    public function image(array $frame, int $pixelPerPoint, $option)
     {
         $h = count($frame);
         $w = strlen($frame[0]);
