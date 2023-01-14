@@ -5,6 +5,7 @@ namespace esp\helper\library\request;
 
 use esp\error\Error;
 use esp\helper\library\ext\Xss;
+use function esp\core\esp_error;
 use function esp\helper\is_mob;
 use function esp\helper\is_card;
 use function esp\helper\is_date;
@@ -109,13 +110,12 @@ final class Post extends Request
         if ($value === '' && !$force) return '';
 
         $len = count($type);
-        if ($len > 1) {
+        if (!$len) {
+            esp_error('Post', '使用->filter()方法第2个及其后参数为要约束的数据类型');
+        } else if ($len > 1) {
             $isTrue = 0;
             foreach ($type as $t) {
-                if ($this->checkString($t, $value)) {
-                    $isTrue++;
-                    continue;
-                }
+                if ($this->checkString($t, $value)) $isTrue++;
             }
             if ($isTrue === 0) {
                 if ($force or !empty($value)) $this->recodeError($key, "不符合规则要求");
