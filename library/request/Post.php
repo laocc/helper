@@ -419,6 +419,16 @@ final class Post extends Request
         $this->_raw = file_get_contents('php://input');
         if (empty($this->_raw) and is_null($type)) return;
 
+        if ($type === 'auto') {
+            if (preg_match('/^\{.+\}$/is', $this->_raw)) {
+                $type = 'json';
+            } else if (preg_match('/^\<.+\>$/is', $this->_raw)) {
+                $type = 'xml';
+            } else {
+                $type = 'string';
+            }
+        }
+
         switch ($type) {
             case 'json':
                 $this->_data = json_decode($this->_raw, true);
