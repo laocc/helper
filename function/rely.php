@@ -16,18 +16,19 @@ function host(string $domain, $branch = null): string
     if (empty($domain)) return '';
     if (strpos($domain, '/')) $domain = explode('/', "{$domain}//")[2];
     if (!is_null($branch)) {
+        if (is_int($branch)) return implode('.', array_slice(explode('.', $domain), 0 - $branch));
         if (is_string($branch)) $branch = explode(',', str_replace(';', ',', $branch));
         foreach ($branch as $bch) {
             if (stripos($domain, $bch)) {
                 $bv = str_replace('.', '\.', $bch);
-                $p2 = "/^(?:[\w\.\-]+\.)?([a-z0-9]+)\.({$bv})$/i";
+                $p2 = "/^(?:[\w\.\-]+\.)?([a-z\d]+)\.({$bv})$/i";
                 if (preg_match($p2, $domain, $match)) return "{$match[1]}.{$match[2]}";
             }
         }
     }
 
     $p1 = "/^(?:[\w\.\-]+\.)?([a-z]+)\.(com|net|org|gov|idv|co|name)\.(cn|cm|my|ph|tw|uk|hk)$/i";
-    $p2 = "/^(?:[\w\.\-]+\.)?([a-z0-9]+)\.([a-z]+)$/i";
+    $p2 = "/^(?:[\w\.\-]+\.)?([a-z\d]+)\.([a-z]+)$/i";
     if (preg_match($p1, $domain, $match)) {
         return "{$match[1]}.{$match[2]}.{$match[3]}";
 
@@ -174,7 +175,6 @@ function locked(string $lockKey, callable $callable, ...$args)
  * @param int $mode
  * @param array|null $trace
  * @return bool
- * @throws Error
  */
 function mk_dir(string $path, int $mode = 0744, array $trace = null): bool
 {
@@ -225,11 +225,11 @@ function xml_encode($root, array $array, bool $outHead = true): string
 /**
  * 随机字符，如果只需要唯一值则用：uniqid()
  * @param int $min 最小长度
- * @param int|null $max 最大长度，若不填，则以$min为固定长度
+ * @param null $max 最大长度，若不填，则以$min为固定长度
  * @param bool $hex 是否只取16进制内
  * @return string
  */
-function str_rand(int $min = 10, int $max = null, bool $hex = false): string
+function str_rand(int $min = 10, $max = null, bool $hex = false): string
 {
     if (is_bool($max)) [$max, $hex] = [null, $max];
     $max = $max ? mt_rand($min, $max) : $min;
