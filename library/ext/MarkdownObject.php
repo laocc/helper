@@ -364,7 +364,7 @@ class MarkdownObject
 
         // link
         $text = preg_replace_callback("/<(?:href)\:(.+?)>/i", function ($matches) {
-            $url = str_replace(['_HTTP', '_DOMAIN'], [_HTTP_, _DOMAIN], $matches[1]);
+            $url = str_replace(['_HTTP', '_DOMAIN'], [((_HTTPS ? 'https:' : 'http:') . '//'), _DOMAIN], $matches[1]);
 //            return ("<a href=\"{$url}\" data-typ='349' target='_blank'>{$url}</a>");
             return $this->makeHolder("<a href=\"{$url}\" data-typ='349' target='_blank'>{$url}</a>");
         }, $text);

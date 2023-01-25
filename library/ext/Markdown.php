@@ -63,7 +63,7 @@ class Markdown
     /**
      * @var array
      */
-    private static $_hooks = Array();
+    private static $_hooks = array();
 
     /**
      * @var array
@@ -86,7 +86,7 @@ class Markdown
      * @var array
      * self::$href[] = ['lv' => $num, 'name' => $name, 'title' => $line];
      */
-    private static $href = Array();
+    private static $href = array();
 
     private static $addNav = false;
 
@@ -99,10 +99,10 @@ class Markdown
      */
     public static function html(string $text, bool $addNav = false, bool $addBoth = true)
     {
-        self::$_footnotes = Array();
-        self::$_definitions = Array();
-        self::$_holders = Array();
-        self::$_html = Array();
+        self::$_footnotes = array();
+        self::$_definitions = array();
+        self::$_holders = array();
+        self::$_html = array();
         self::$_uniqid = md5(uniqid());
         self::$_id = 0;
         self::$addNav = $addNav;
@@ -116,7 +116,7 @@ class Markdown
             ($addBoth ? '<div style="display: block;width:100%;height:100px;clear: both;"></div>' : '');
     }
 
-    private static $_html = Array();
+    private static $_html = array();
 
     /**
      * 处理<<<HTML代码>>>
@@ -151,7 +151,7 @@ class Markdown
     {
         if (!self::$href) return '';
         $nav = count(self::$href) > 35 ? 'nav navMore' : 'nav';
-        $html = Array();
+        $html = array();
         $html[] = "<ol class='{$nav}'>";
         $html[] = "<li><a href='#' target='_self'>Top</a></li>";
 
@@ -221,7 +221,7 @@ class Markdown
     private static function parse($text)
     {
         $blocks = self::parseBlock($text, $lines);
-        $html = Array();
+        $html = array();
         foreach ($blocks as &$block) {
             list ($type, $start, $end, $value) = $block;
             $extract = array_slice($lines, $start, $end - $start + 1);
@@ -273,7 +273,7 @@ class Markdown
         }
 
         if ($clearHolders) {
-            self::$_holders = Array();
+            self::$_holders = array();
         }
 
         return $text;
@@ -348,7 +348,7 @@ class Markdown
 
         // link
         $text = preg_replace_callback("/<(?:href)\:(.+?)>/i", function ($matches) {
-            $url = str_replace(['_HTTP', '_DOMAIN'], [_HTTP_, _DOMAIN], $matches[1]);
+            $url = str_replace(['_HTTP', '_DOMAIN'], [((_HTTPS ? 'https:' : 'http:') . '//'), _DOMAIN], $matches[1]);
 //            return ("<a href=\"{$url}\" data-typ='349' target='_blank'>{$url}</a>");
             return self::makeHolder("<a href=\"{$url}\" data-typ='349' target='_blank'>{$url}</a>");
         }, $text);
@@ -516,7 +516,7 @@ class Markdown
     private static function parseBlock($text, &$lines)
     {
         $lines = explode("\n", $text);
-        self::$_blocks = Array();
+        self::$_blocks = array();
         self::$_current = 'normal';
         self::$_pos = -1;
         $special = implode("|", array_keys(self::$_specialWhiteList));
@@ -643,7 +643,7 @@ class Markdown
                         }
 
                         $rows = preg_split("/(\+|\|)/", $matches[1]);
-                        $aligns = Array();
+                        $aligns = array();
                         foreach ($rows as &$row) {
                             $align = 'none';
 
@@ -941,7 +941,7 @@ class Markdown
     {
         $html = '';
         $minSpace = 99999;
-        $rows = Array();
+        $rows = array();
 
         // count levels
         foreach ($lines as $key => &$line) {
@@ -967,7 +967,7 @@ class Markdown
         $secondMinSpace = $found ?: $minSpace;
 
         $lastType = '';
-        $leftLines = Array();
+        $leftLines = array();
 
         foreach ($rows as &$row) {
             if (is_array($row)) {
@@ -1051,7 +1051,7 @@ class Markdown
                 }
             }, explode('|', $line));
 
-            $columns = Array();
+            $columns = array();
             $last = -1;
 
             foreach ($rows as &$row) {
