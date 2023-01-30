@@ -26,7 +26,7 @@ function between_value($value, $min, $max)
 
 
 /**
- * @param $ext
+ * @param string $ext
  * @return int
  */
 function image_type(string $ext): int
@@ -98,7 +98,7 @@ function date_since($time, $original, $extended = 0, $text = '前')
  * @param null $ua
  * @return string
  */
-function brand($ua = null)
+function brand($ua = null): string
 {
     if (is_null($ua)) $ua = (getenv('HTTP_USER_AGENT') ?: '');
 

@@ -302,6 +302,39 @@ function gid($fh = null, $format = 0): string
     return implode($fh, $str);
 }
 
+/**
+ * 身份证号信息解析
+ *
+ * @param string $idCode
+ * @return array|string
+ */
+function id_card_info(string $idCode)
+{
+    if (!is_card($idCode)) return '身份证号格式不正确';
+    $data = [];
+    $data['area'] = substr($idCode, 0, 6);
+    $data['birthday'] = substr($idCode, 6, 4) . '-' . substr($idCode, 10, 2) . '-' . substr($idCode, 12, 2);
+    $data['age'] = intval(date('Y')) - intval(substr($idCode, 6, 4));
+    if (date('m') > substr($idCode, 10, 2)) $data['age'] += 1;
+    $data['sex'] = substr($idCode, 16, 1) % 2;//1男0女，换成1男2女：2-x
+    return $data;
+}
+
+/**
+ * 创建完整的身份证号码
+ *
+ * @param string $zone
+ * @param string|null $day
+ * @param string|null $number
+ * @return string
+ */
+function make_card(string $zone, string $day = null, string $number = null): string
+{
+    $suffix = make_card_suffix($zone, $day, $number);
+    if (strlen($suffix) > 1) return $suffix;
+    if (is_null($day)) return $zone . $suffix;
+    return $zone . $day . $number . $suffix;
+}
 
 /**
  * 生成身份证最后一位识别码
@@ -311,7 +344,7 @@ function gid($fh = null, $format = 0): string
  * @param string|null $number 后三位号码
  * @return string
  */
-function make_card(string $zone, string $day = null, string $number = null): string
+function make_card_suffix(string $zone, string $day = null, string $number = null): string
 {
     if (is_null($day)) {
         if (!preg_match('/^(\d{6})(\d{8})(\d{3})/', $zone, $mat)) return '身份证号前17位格式不正确';
