@@ -879,3 +879,49 @@ function _table(array $data)
         else echo "┻";
     }
 }
+
+
+/**
+ * @param string $json_file
+ * @param int $power
+ * @return array|string
+ */
+function menu_file(string $json_file, int $power = -1)
+{
+    if (!is_readable($json_file)) return "{$json_file} not exists.";
+
+    $menu = str_replace(['_HOST', "\n", "\r"], [_HOST, ''], file_get_contents($json_file));
+    $menu = json_decode($menu, true);
+    if (isset($menu[0])) $menu = ['default' => $menu];
+
+    return array_map(function (array $men2) use ($power) {
+        foreach ($men2 as &$menu) {
+            if (isset($menu['display']) and !$menu['display']) {
+                $menu = null;
+                continue;
+            }
+            if (isset($menu['power']) && $power >= 0 && !($power & $menu['power'])) {
+                $menu = null;
+                continue;
+            }
+            unset($menu['power'], $menu['display']);
+
+            if (isset($menu['item'])) {
+                foreach ($menu['item'] as $i => &$m) {
+                    if (isset($m['display']) and !$m['display']) {
+                        $m = null;
+                        continue;
+                    }
+                    if (isset($m['power']) && $power >= 0 && !($power & $m['power'])) {
+                        $m = null;
+                        continue;
+                    }
+                    unset($menu['item'][$i]['power'], $menu['item'][$i]['display']);
+                }
+            }
+        }
+
+        return $men2;
+    }, $menu);
+}
+
