@@ -26,7 +26,7 @@ class Result
     private array $_pageValue;
     private Paging $_paging;
 
-    public function __construct(string $token = __FILE__)
+    public function __construct(string $token = '')
     {
         $this->_token = $token;
     }
