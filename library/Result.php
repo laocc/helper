@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace esp\helper\library;
 
 
+use function esp\core\esp_error;
+
 /**
  * ajax/post中返回数据的封装
  *
@@ -48,16 +50,20 @@ class Result
      */
     public function __get(string $key)
     {
-        $key = "_{$key}";
-        if (isset($this->{$key})) return $this->{$key};
-        return null;
+        return $this->_data[$key] ?? null;
+    }
+
+    public function __set(string $key, $value)
+    {
+        $this->_data[$key] = $value;
+        return $this;
     }
 
     /**
      * @param bool $value 可以是bool或int
      * @return $this
      */
-    public function success($value = true): Result
+    public function success($value = 1): Result
     {
         $this->_success = intval($value);
         return $this;
@@ -67,7 +73,7 @@ class Result
      * @param int $value 错误代码
      * @return $this
      */
-    public function error(int $value = -1): Result
+    public function error_code(int $value = -1): Result
     {
         if ($value === -1 && $this->_error === 0) $this->_error = 1;
         else $this->_error = $value;
@@ -79,20 +85,25 @@ class Result
         return $this;
     }
 
+    public function error($msg): Result
+    {
+        if (is_int($msg)) return $this->error_code($msg);
+        $this->_message = $msg;
+        $this->_error = 1;
+        return $this;
+    }
+
     /**
      * @param string $msg
      * @param bool $append
      * @return $this
      */
-    public function message($msg = 'ok', bool $append = false): Result
+    public function message(string $msg, bool $append = false): Result
     {
-        if (is_array($msg)) $msg = json_encode($msg, 256 | 64);
-        else if (is_object($msg)) $msg = var_export($msg, true);
-
         if ($append) {
-            $this->_message .= strval($msg);
+            $this->_message .= $msg;
         } else {
-            $this->_message = strval($msg);
+            $this->_message = $msg;
         }
         return $this;
     }
@@ -102,13 +113,12 @@ class Result
      * @param $value
      * @return Result
      */
-    public function data($key, $value = 'nullValue'): Result
+    public function data($key, $value = null): Result
     {
-        if (is_string($key) and $value !== 'nullValue') {
-            if (is_null($value)) {
-                unset($this->_data[$key]);
-                return $this;
-            }
+        if (is_array($key)) {
+            $this->_data = array_merge($this->_data, $key);
+
+        } else if (is_string($key)) {
             if (strpos($key, '.') > 0) {
                 $obj = &$this->_data;
                 foreach (explode('.', $key) as $k) {
@@ -119,12 +129,21 @@ class Result
                 return $this;
             }
             $this->_data[$key] = $value;
-        } else if (is_array($key)) {
-            $this->_data = array_merge($this->_data, $key);
         } else {
-            $this->_data = $key;
-
+            esp_error("Result->data() 第1参数需为array或string类型");
         }
+        return $this;
+    }
+
+    public function unset_data(string $key): Result
+    {
+        unset($this->_data[$key]);
+        return $this;
+    }
+
+    public function append(string $key, $value): Result
+    {
+        $this->_append[$key] = $value;
         return $this;
     }
 
@@ -142,12 +161,6 @@ class Result
     public function action(string $action): Result
     {
         $this->append('action', $action);
-        return $this;
-    }
-
-    public function append(string $key, $value): Result
-    {
-        $this->_append[$key] = $value;
         return $this;
     }
 
