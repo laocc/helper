@@ -17,16 +17,16 @@ abstract class Request
     /**
      * 数字类：表示最大最小值
      * 字串类：表示为最短最长
-     * @param $value
+     * @param int $value
      * @return $this
      */
-    public function min($value)
+    public function min(int $value)
     {
         $this->_min = $value;
         return $this;
     }
 
-    public function max($value)
+    public function max(int $value)
     {
         $this->_max = $value;
         return $this;
@@ -113,13 +113,19 @@ abstract class Request
         $sKey = $param['sign_key'] ?? 'sign';
         $tKey = $param['token_key'] ?? 'key';
         $token = $param['token'] ?? '';
-        if (isset($param['sign_data'])) {
-            $data = $param['sign_data'];
+        $data = $param['sign_data'] ?? $this->_data;
+
+        if (substr($sKey, 0, 5) === 'HTTP_') {
+            $sign = getenv($sKey);
+
+        } else if (isset($param[$sKey])) {
+            $sign = $param[$sKey];
+
         } else {
-            $data = $this->_data;
+            $sign = $data[$sKey] ?? '';
+            unset($data[$sKey]);
         }
-        $sign = $data[$sKey] ?? '';
-        unset($data[$sKey]);
+
         ksort($data);
         $str = '';
         foreach ($data as $k => $v) {
