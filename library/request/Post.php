@@ -417,7 +417,7 @@ final class Post extends Request
         }
 
         $this->_raw = file_get_contents('php://input');
-        if (empty($this->_raw) and is_null($type)) return;
+        if (empty($this->_raw) or is_null($type)) return;
 
         if ($type === 'auto') {
             if (preg_match('/^\{.+\}$/is', $this->_raw)) {
@@ -429,37 +429,37 @@ final class Post extends Request
             }
         }
 
+        $data = [];
         switch ($type) {
             case 'json':
-                $this->_data = json_decode($this->_raw, true);
+                $data = json_decode($this->_raw, true);
                 break;
 
             case 'xml':
-                $this->_data = xml_decode($this->_raw, true);
+                $data = xml_decode($this->_raw, true);
                 break;
 
             case 'php':
-                $this->_data = unserialize($this->_raw);
+                $data = unserialize($this->_raw);
                 break;
 
             case 'unknown':
                 //不确定格式
                 if (($this->_raw[0] === '{' and $this->_raw[-1] === '}')
                     or ($this->_raw[0] === '[' and $this->_raw[-1] === ']')) {
-                    $this->_data = json_decode($this->_raw, true);
+                    $data = json_decode($this->_raw, true);
 
                 } else if ($this->_raw[0] === '<' and $this->_raw[-1] === '>') {
-                    $this->_data = xml_decode($this->_raw, true);
+                    $data = xml_decode($this->_raw, true);
 
                 }
                 break;
 
             default:
-                parse_str($this->_raw, $this->_data);
+                parse_str($this->_raw, $data);
         }
 
-
-        if (!is_array($this->_data) or empty($this->_data)) $this->_data = [];
+        if (is_array($data)) $this->_data = $data;
     }
 
 
