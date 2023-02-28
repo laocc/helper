@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace esp\helper\library\request;
 
-use esp\error\Error;
 use esp\helper\library\ext\Xss;
 use function esp\core\esp_error;
 use function esp\helper\is_mob;
@@ -85,8 +84,8 @@ final class Post extends Request
                 return preg_match('/^\d+$/', strval($value));
             case 'decimal':
                 return preg_match('/^\d+(\.\d+)?$/', strval($value));
-            case 'alphanumeric':
-                return preg_match('/^[a-zA-Z0-9]+$/', strval($value));
+            case 'alphanumeric'://字母和数字
+                return preg_match('/^[a-z\d]+$/i', strval($value));
             default:
                 if (is_match($type)) return preg_match($type, strval($value));
         }
@@ -111,7 +110,7 @@ final class Post extends Request
 
         $len = count($type);
         if (!$len) {
-            esp_error('Post', '使用->filter()方法第2个及其后参数为要约束的数据类型');
+            esp_error('Post', "使用->filter('{$key}',...type)方法时第2个及其后参数为要约束的数据类型");
         } else if ($len > 1) {
             $isTrue = 0;
             foreach ($type as $t) {
@@ -200,7 +199,7 @@ final class Post extends Request
     {
         $value = $this->getData($key, $force);
         if (is_null($value)) return 0;
-        $value = str_replace(['+', '%3A'], [' ', ':'], $value);
+        $value = str_replace(['+', '%3A'], [' ', ':'], strval($value));
         if (empty($value) && $force) $this->recodeError($key);
 
         $value = strtotime($value) ?: 0;
@@ -264,10 +263,9 @@ final class Post extends Request
     /**
      * 返回的是[金额分]，若需要[金额元]级，请用float
      * @param string $key
-     * @param bool $cent
      * @return int
      */
-    public function money(string $key, bool $cent = true): int
+    public function money(string $key): int
     {
         $value = $this->getData($key, $force);
         if (is_null($value)) return 0;
@@ -281,7 +279,7 @@ final class Post extends Request
     {
         $this->_min = null;
         $this->_max = null;
-        if (!is_match($pnt)) throw new Error('传入的表达式不合法', 1);
+        if (!is_match($pnt)) esp_error('Post', "{$key} 传入的正则表达式不合法");
         $value = $this->getData($key, $force);
         if (is_null($value)) return '';
         if (empty($value) && $force) $this->recodeError($key);
@@ -308,12 +306,10 @@ final class Post extends Request
 
         $value = $this->getData($key, $force);
         if (is_null($value)) return '';
-
-        if (is_array($value)) $value = json_encode($value, $options);
-
         if (empty($value) && $force) $this->recodeError($key);
 
-        if (!preg_match('/^[\{\[].+[\]\}]$/', strval($value))) {
+        if (is_array($value)) $value = json_encode($value, $options);
+        else if (!preg_match('/^[\{\[].+[\]\}]$/', strval($value))) {
             if ($force) $this->recodeError($key, "不是有效的JSON格式");
             return '';
         }
@@ -336,10 +332,9 @@ final class Post extends Request
         $value = $this->getData($key, $force);
         if (is_null($value)) return '';
 
-        if (is_array($value)) $value = xml_encode($root, $value, false);
         if (empty($value) && $force) $this->recodeError($key);
-
-        if (!preg_match('/^<\w+>.+<\/\w+>$/', strval($value))) {
+        if (is_array($value)) $value = xml_encode($root, $value, false);
+        else if (!preg_match('/^<\w+>.+<\/\w+>$/', strval($value))) {
             if ($force) $this->recodeError($key, "不是有效的XML格式");
             return '';
         }
