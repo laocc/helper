@@ -32,6 +32,7 @@ namespace esp\helper\library\ext;
 */
 
 use esp\helper\library\gd\Image;
+use function esp\helper\mk_dir;
 
 final class Upload
 {
@@ -57,6 +58,7 @@ final class Upload
     {
         $save = $this->filename('jpg');
         $file = "{$save['root']}{$save['folder']}{$save['name']}.jpg";
+        mk_dir($file);
         $img = base64_decode($base64);
         $length = @file_put_contents($file, $img);//返回的是字节数
         if (!$length) return [];
@@ -77,7 +79,7 @@ final class Upload
 
     public function base64()
     {
-        $upSave = Array();
+        $upSave = array();
         $val = file_get_contents("php://input");
         parse_str($val, $arr);
         if (empty($arr)) return [];
@@ -92,7 +94,7 @@ final class Upload
     public function upload()
     {
         if (empty($_FILES)) return [];
-        $upSave = Array();
+        $upSave = array();
 
         foreach ($_FILES as $key => &$upLoad) {
             //同时传了多个文件
@@ -131,7 +133,7 @@ final class Upload
     private function DownLoad_Save($url)
     {
         if (!$url) return null;
-        $return = Array();
+        $return = array();
         $name = strrchr($url, '/');
         $ext = trim(strrchr($name, '.'), '.');
         $save = $this->filename($ext);
@@ -143,7 +145,7 @@ final class Upload
         $return['size'] = strlen($IM);
 
         //保存
-        file_put_contents($save['path'], $IM);
+        @file_put_contents($save['path'], $IM);
         $return['md5'] = md5_file($save['path']);
 
         if (!$ext) {
@@ -172,7 +174,7 @@ final class Upload
 
     private function Upload_Save($FILES)
     {
-        $return = Array();
+        $return = array();
         $return['error'] = null;
 
         //错误检索

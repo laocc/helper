@@ -120,10 +120,17 @@ function in_root(string $path): bool
  */
 function save_file(string $file, $content, bool $append = false, array $trace = null): int
 {
-    if (is_null($trace)) $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
-    mk_dir($file, 0740, $trace);
+//    if (is_null($trace)) $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
     if (is_array($content)) $content = json_encode($content, 256 | 64);
-    return file_put_contents($file, $content, $append ? FILE_APPEND : LOCK_EX);
+    $tryOnce = true;
+    tryOnce:
+    mk_dir($file, 0740, $trace);
+    $save = @file_put_contents($file, $content, $append ? FILE_APPEND : LOCK_EX);
+    if ($save === false and $tryOnce) {
+        $tryOnce = false;
+        goto tryOnce;
+    }
+    return $save;
 }
 
 /**
@@ -179,6 +186,8 @@ function locked(string $lockKey, callable $callable, ...$args)
 function mk_dir(string $path, int $mode = 0744, array $trace = null): bool
 {
     if (!$path) return false;
+    if (file_exists($path)) return true;
+
     $check = strrchr($path, '/');
     if ($check === false) {
         throw new Error("目录或文件名中必须要含有/号，当前path=" . var_export($path, true));

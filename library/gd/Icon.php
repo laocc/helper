@@ -44,13 +44,13 @@ class Icon
             $gd_image = imagecreatetruecolor($size, $size);
             imagecopyresampled($gd_image, $file_image, 0, 0, 0, 0, $size, $size, $info[0], $info[1]);
             $im = self::im_data($gd_image, $size);
-            file_put_contents($icon_file, $im);
+            @file_put_contents($icon_file, $im);
 
         } else {
             if (!$icon_file) throw new Error('文件流格式生成ICON时须指定要保存的文件名');
             $file_image = Gd::createIM($img, false);
             $im = self::im_data($file_image);
-            file_put_contents($icon_file, $im);
+            @file_put_contents($icon_file, $im);
         }
         return $icon_file;
     }
