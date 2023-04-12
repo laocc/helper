@@ -806,6 +806,7 @@ function screen_width(): int
  */
 function _table(array $data)
 {
+    if (empty($data)) $data = [['EMPTY' => '$data is Empty']];
     /**
      * 字串实际显示占位，utf8是3位，实际显示出来到终端gbk是2位
      * @param string $w
@@ -820,7 +821,7 @@ function _table(array $data)
     foreach ($data as $rs) {
         $title = array_unique(array_merge($title, array_keys($rs)));
         foreach ($rs as $w => $v) {
-            $width[$w] = max($width[$w] ?? 0, $wLen($w), $wLen($v));
+            $width[$w] = max($width[$w] ?? 0, $wLen(strval($w)), $wLen(strval($v)));
         }
     }
 
@@ -862,7 +863,7 @@ function _table(array $data)
         foreach ($rs as $r => $v) {
             $index++;
             if ($index === 1) echo "┃";
-            $lost = $width[$r] - $wLen($v);
+            $lost = $width[$r] - $wLen(strval($v));
             echo $v;
             if ($lost) echo str_repeat(" ", $lost);
             echo "┃";
