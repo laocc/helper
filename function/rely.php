@@ -88,7 +88,7 @@ function load(string $file)
  */
 function root(string $path, bool $real = false): string
 {
-    foreach (['/home/', '/mnt/', '/mdb/', '/mda/', '/mdc/', '/tmp/', '/www/'] as $r) {
+    foreach (['/home/', '/mnt/', '/mda/', '/mdb/', '/mdc/', '/mdd/', '/mde/', '/tmp/', '/www/'] as $r) {
         if (strpos($path, $r) === 0) goto end;
     }
 
