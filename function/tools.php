@@ -727,6 +727,7 @@ function disk_size(array $disk)
  */
 function _echo($text, string $bgColor = null, string $ftColor = null)
 {
+    if (!_CLI) return;
     if (is_array($text)) $text = print_r($text, true);
     $text = trim($text, "\n");
     $front = ['green' => 32, 'g' => 32, 'red' => 31, 'r' => 31, 'yellow' => 33, 'y' => 33, 'blue' => 34, 'b' => 34, 'white' => 37, 'w' => 37, 'black' => 30, 'h' => 30];
@@ -749,7 +750,7 @@ function _echo($text, string $bgColor = null, string $ftColor = null)
 function object_json(string $jsObject)
 {
     return preg_replace(
-        ["/([a-zA-Z_]+[a-zA-Z0-9_]*)\s*:/", "/:\s*'(.*?)'/"],
+        ["/([a-zA-Z_]+\w*)\s*:/", "/:\s*'(.*?)'/"],
         ['"\1":', ': "\1"'],
         $jsObject);
 }
