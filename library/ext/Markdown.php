@@ -252,7 +252,8 @@ class Markdown
         $args = array_slice($args, 1);
 
         foreach (self::$_hooks[$type] as &$callback) {
-            $value = call_user_func_array($callback, $args);
+            $value = $callback(...$args);
+//            $value = call_user_func_array($callback, $args);
             $args[0] = $value;
         }
 

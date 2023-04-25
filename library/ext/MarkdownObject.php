@@ -63,7 +63,7 @@ class MarkdownObject
     /**
      * @var array
      */
-    private $_hooks = Array();
+    private $_hooks = array();
 
     /**
      * @var array
@@ -86,7 +86,7 @@ class MarkdownObject
      * @var array
      * $this->href[] = ['lv' => $num, 'name' => $name, 'title' => $line];
      */
-    private $href = Array();
+    private $href = array();
 
     private $addNav = false;
 
@@ -106,10 +106,10 @@ class MarkdownObject
      */
     public function render(string $text, bool $addNav = false, bool $addBoth = true)
     {
-        $this->_footnotes = Array();
-        $this->_definitions = Array();
-        $this->_holders = Array();
-        $this->_html = Array();
+        $this->_footnotes = array();
+        $this->_definitions = array();
+        $this->_holders = array();
+        $this->_html = array();
         $this->_uniqid = md5(uniqid());
         $this->_id = 0;
         $this->addNav = $addNav;
@@ -123,7 +123,7 @@ class MarkdownObject
             ($addBoth ? '<div style="display: block;width:100%;height:100px;clear: both;"></div>' : '');
     }
 
-    private $_html = Array();
+    private $_html = array();
 
     /**
      * 处理<<<HTML代码>>>
@@ -158,7 +158,7 @@ class MarkdownObject
     {
         if (!$this->href) return '';
         $nav = count($this->href) > 35 ? 'nav navMore' : 'nav';
-        $html = Array();
+        $html = array();
         $html[] = "<ol class='{$nav}'>";
         $html[] = "<li><a href='#' target='_self'>Top</a></li>";
 
@@ -228,7 +228,7 @@ class MarkdownObject
     private function parse($text)
     {
         $blocks = $this->parseBlock($text, $lines);
-        $html = Array();
+        $html = array();
         foreach ($blocks as &$block) {
             list ($type, $start, $end, $value) = $block;
             $extract = array_slice($lines, $start, $end - $start + 1);
@@ -259,7 +259,8 @@ class MarkdownObject
         $args = array_slice($args, 1);
 
         foreach ($this->_hooks[$type] as &$callback) {
-            $value = call_user_func_array($callback, $args);
+            $value = $callback(...$args);
+//            $value = call_user_func_array($callback, $args);
             $args[0] = $value;
         }
 
@@ -280,7 +281,7 @@ class MarkdownObject
         }
 
         if ($clearHolders) {
-            $this->_holders = Array();
+            $this->_holders = array();
         }
 
         return $text;
@@ -532,7 +533,7 @@ class MarkdownObject
     private function parseBlock($text, &$lines)
     {
         $lines = explode("\n", $text);
-        $this->_blocks = Array();
+        $this->_blocks = array();
         $this->_current = 'normal';
         $this->_pos = -1;
         $special = implode("|", array_keys($this->_specialWhiteList));
@@ -659,7 +660,7 @@ class MarkdownObject
                         }
 
                         $rows = preg_split("/(\+|\|)/", $matches[1]);
-                        $aligns = Array();
+                        $aligns = array();
                         foreach ($rows as &$row) {
                             $align = 'none';
 
@@ -959,7 +960,7 @@ class MarkdownObject
     {
         $html = '';
         $minSpace = 99999;
-        $rows = Array();
+        $rows = array();
 
         // count levels
         foreach ($lines as $key => &$line) {
@@ -985,7 +986,7 @@ class MarkdownObject
         $secondMinSpace = $found ?: $minSpace;
 
         $lastType = '';
-        $leftLines = Array();
+        $leftLines = array();
 
         foreach ($rows as &$row) {
             if (is_array($row)) {
@@ -1069,7 +1070,7 @@ class MarkdownObject
                 }
             }, explode('|', $line));
 
-            $columns = Array();
+            $columns = array();
             $last = -1;
 
             foreach ($rows as &$row) {
