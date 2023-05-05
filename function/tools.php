@@ -491,6 +491,20 @@ function str_cut(string $str): array
 }
 
 /**
+ * 过滤所有符号
+ *
+ * @param string $text
+ * @return string
+ *
+ * [\u2E80-\u9FFF]：汉字、日语假名、韩文字母等东亚语言中的常用字符
+ * [\u4E00-\u9FFF]：仅包括中文
+ */
+function cut_symbols(string $text): string
+{
+    return preg_replace('/[^\x{4e00}-\x{9fa5}\w\s]/iu', '', $text);
+}
+
+/**
  * 将字符串大小写对换，只能用于纯英文半角
  *
  * @param string $string
