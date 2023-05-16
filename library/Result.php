@@ -14,21 +14,22 @@ use function esp\core\esp_error;
  */
 class Result
 {
-    private int $_success = 1;
-    private int $_error = 0;
-    private string $_message = 'ok';
-    private string $_token = '';
-    private array $_data = [];
-    private array $_append = [];
-    private array $_update = [];
-    private array $_error_value = [];
+    protected int $_success = 1;
+    protected int $_error = 0;
+    protected string $_message = 'ok';
+    protected string $_token = '';
+    protected array $_data = [];
+    protected array $_append = [];
+    protected array $_update = [];
+    protected array $_error_value = [];
+    protected bool $dataNode = true;
+    protected array $_pageValue;
+    protected Paging $_paging;
 
-    private array $_pageValue;
-    private Paging $_paging;
-
-    public function __construct(string $token = '')
+    public function __construct(string $token = '', bool $dataNode = true)
     {
         $this->_token = $token;
+        $this->dataNode = $dataNode;
     }
 
     public function setToken($token = null): Result
@@ -116,6 +117,9 @@ class Result
     public function data($key, $value = null): Result
     {
         if (is_array($key)) {
+            if (!$this->dataNode) {
+                esp_error("Result->data() 第1参数需为string，指定值key");
+            }
             $this->_data = array_merge($this->_data, $key);
 
         } else if (is_string($key)) {
