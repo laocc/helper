@@ -233,7 +233,7 @@ function is_ip(string $value, string $which = 'ipv4'): bool
             $which = FILTER_FLAG_IPV6;
             break;
         default:
-            $which = NULL;
+            $which = FILTER_DEFAULT;
             break;
     }
     return (bool)filter_var($value, FILTER_VALIDATE_IP, $which);
