@@ -104,7 +104,7 @@ class MarkdownObject
      * @param bool $addBoth
      * @return string
      */
-    public function render(string $text, bool $addNav = false, bool $addBoth = true)
+    public function render(string $text, bool $addNav = null, bool $addBoth = true)
     {
         $this->_footnotes = array();
         $this->_definitions = array();
@@ -112,7 +112,8 @@ class MarkdownObject
         $this->_html = array();
         $this->_uniqid = md5(uniqid());
         $this->_id = 0;
-        $this->addNav = $addNav;
+        if (isset($this->conf['addNav']) and is_null($addNav)) $addNav = boolval($this->conf['addNav']);
+        $this->addNav = boolval($addNav);
         $this->replaceHtml($text);//优先处理<<<html>>>
         $text = str_replace(["\t", "\r"], ['    ', ''], $text);
         $html = $this->parse($text);
@@ -160,10 +161,10 @@ class MarkdownObject
         $nav = count($this->href) > 35 ? 'nav navMore' : 'nav';
         $html = array();
         $html[] = "<ol class='{$nav}'>";
-        $html[] = "<li><a href='#' target='_self'>Top</a></li>";
+        $html[] = "<li class='top'><a href='#' target='_self'>Top</a></li>";
 
         foreach ($this->href as $i => &$li) {
-            $html[] = "<li><a href='#{$li["name"]}' target='_self'>{$li['title']}</a></li>";
+            $html[] = "<li class='li{$li["lv"]}'><a href='#{$li["name"]}' target='_self'>{$li['title']}</a></li>";
         }
         $html[] = "</ol>";
         return implode($html);
