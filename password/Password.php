@@ -149,7 +149,7 @@ class Password
 
     //此处正反加解密的结果，原则上不是用于存入数据库的，因为有可能字典会变
 
-    private static $RANDOM = '{#ED#}';
+    private static string $RANDOM = '{#ED#}';
 
     /**
      * 正向加密，可以加密任意字符串，包括中文
@@ -173,9 +173,9 @@ class Password
     /**
      * 反向解密
      * @param string $String 待解密串
-     * @return null
+     * @return string
      */
-    public static function base_de(string $String)
+    public static function base_de(string $String): string
     {
         $RS = str_split($String);
         $arr = self::base_disc(count($RS));
@@ -187,7 +187,7 @@ class Password
         $str = explode(self::$RANDOM, $decode . self::$RANDOM . self::$RANDOM);
         unset($RS, $new, $rs, $decode, $arr);
         if ((int)$str[0] > 0 and (0 === (int)$str[2] or ((int)$str[0] + 86400 * (int)$str[2]) > time())) return $str[1];
-        return null;
+        return '';
     }
 
     /**
@@ -198,7 +198,12 @@ class Password
      */
     private static function base_disc(int $i): array
     {
-        if (defined('_base_factor')) return _base_factor[$i % count(_base_factor)];
+        if (defined('_base_factor')) {
+            if (is_array(_base_factor)) return _base_factor[$i % count(_base_factor)];
+            $disc = self::disc_decode(_base_factor);
+            return $disc[$i % count($disc)];
+        }
+
         $arr = array();
         $arr[0] = ['a' => '4', 'b' => 'b', 'c' => 'r', 'd' => '!', 'e' => '@', 'f' => 'W', 'g' => '0', 'h' => 'n', 'i' => 'V', 'j' => 'L', 'k' => '5', 'l' => 'd', 'm' => 'E', 'n' => 'h', 'o' => 'T', 'p' => '$', 'q' => 'S', 'r' => 'j', 's' => 'a', 't' => 'B', 'u' => 's', 'v' => 'G', 'w' => 'I', 'x' => '/', 'y' => 'o', 'z' => 'Q', 'A' => 'g', 'B' => '3', 'C' => 'A', 'D' => 'Y', 'E' => '-', 'F' => 'O', 'G' => 'l', 'H' => 'p', 'I' => 'k', 'J' => 'v', 'K' => 'c', 'L' => '8', 'M' => '_', 'O' => 'i', 'P' => 'e', 'Q' => 'J', 'R' => 'P', 'S' => 'w', 'T' => 'R', 'U' => 'K', 'V' => 'q', 'W' => '2', 'X' => 'F', 'Y' => 'z', 'Z' => '6', '0' => 'm', '1' => 'Z', '2' => 'H', '3' => 'u', '4' => '*', '5' => '.', '6' => 'x', '7' => '%', '8' => 'M', '9' => '+', '+' => 'D', '-' => '9', '*' => 'X', '/' => 'y', '.' => '1', '!' => 'f', '@' => '7', '$' => 'C', '%' => 'U', '_' => 't'];
         $arr[1] = ['a' => 'B', 'b' => 'x', 'c' => '1', 'd' => '2', 'e' => '6', 'f' => 'c', 'g' => 'D', 'h' => 'R', 'i' => 'g', 'j' => '-', 'k' => 'S', 'l' => 'a', 'm' => 'm', 'n' => 'f', 'o' => 'J', 'p' => 'u', 'q' => 'r', 'r' => 'F', 's' => '.', 't' => '3', 'u' => '7', 'v' => 'I', 'w' => 'P', 'x' => '9', 'y' => 'M', 'z' => 'w', 'A' => 'd', 'B' => 'W', 'C' => 'E', 'D' => 'i', 'E' => 'K', 'F' => 'n', 'G' => 'p', 'H' => '+', 'I' => '$', 'J' => '_', 'K' => 'Q', 'L' => 'G', 'M' => 'v', 'O' => '%', 'P' => 'e', 'Q' => 'z', 'R' => 'y', 'S' => 'k', 'T' => 'A', 'U' => 'V', 'V' => 'H', 'W' => '@', 'X' => '0', 'Y' => 'O', 'Z' => '8', '0' => 'j', '1' => 't', '2' => '*', '3' => 'o', '4' => 'U', '5' => '5', '6' => 'Y', '7' => 'l', '8' => 'C', '9' => 'X', '+' => 's', '-' => 'L', '*' => 'q', '/' => '4', '.' => '/', '!' => 'T', '@' => 'b', '$' => 'Z', '%' => '!', '_' => 'h'];
@@ -210,25 +215,62 @@ class Password
 
     /**
      * 生成字典，这个程序不调用，仅为以后更新字典而用，字典里特别注意不能有#&这两个符号
-     * @param int $len 生成几组
+     *
+     * @param int $len
+     * @param bool $enRsa
+     * @return void
      */
-    public static function string_disc_rand(int $len = 10)
+    public static function string_disc_rand(int $len = 10, bool $enRsa = false)
     {
+        $disc = [];
         $abc = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMOPQRSTUVWXYZ0123456789+-*/.!@$%_';
         for ($l = 0; $l < $len; $l++) {
             $aaa = str_shuffle($abc);
             $a = str_split($abc);
             $b = str_split($aaa);
             $str = array();
-            foreach ($a as $i => &$ab) {
+            $line = array();
+            foreach ($a as $i => $ab) {
                 $str[] = "'{$ab}'=>'{$b[$i]}'";
+                $line[$ab] = $b[$i];
             }
-            echo "$" . "arr[{$l}]=[" . (implode(',', $str)) . "];\n";
+            $disc[] = $line;
+            if (!$enRsa) echo "$" . "arr[{$l}]=[" . (implode(',', $str)) . "];\n";
         }
+        if (!$enRsa) return;
+
+        $disc = str_replace(['"', ':', ',', '\\'], '', json_encode($disc));
+        $disc = str_replace('}{', ',', substr($disc, 2, -2));
+        $base = str_split(base64_encode($disc), 64);
+        echo "\n-----BEGIN PRIVATE KEY-----\n" . implode("\n", $base) . "\n-----END PRIVATE KEY-----\n";
     }
 
+    /**
+     * 解析 string_disc_rand 生成的密钥
+     * @param string $rsa
+     * @return array
+     */
+    public static function disc_decode(string $rsa): array
+    {
+        if ($rsa[0] === '/') {
+            if (!is_readable($rsa)) return [];
+            $rsa = file_get_contents($rsa);
+        }
+        $rsa = trim(preg_replace('/\-[A-Z\s\-]+\-/', '', $rsa));
+        $json = explode(',', base64_decode($rsa));
+        $disc = [];
+        foreach ($json as $ls) {
+            if (empty($ls)) continue;
+            $pwd = [];
+            foreach (str_split($ls, 2) as $a) $pwd[$a[0]] = $a[1] ?? '';
+            $disc[] = $pwd;
+        }
+        return $disc;
+    }
+
+
     //**************************************** 字符串 加密+解密 ********************************************************************
-    private static $str_disc_len = 2;//转换因子有几组
+    private static int $str_disc_len = 2;//转换因子有几组
 
     /**
      * 正向加密
@@ -291,7 +333,7 @@ class Password
     }
 
     //**************************************** 整型 加密+解密 ********************************************************************
-    private static $int_disc_len = 2;//整型转换因子有几组
+    private static int $int_disc_len = 2;//整型转换因子有几组
 
     /**
      * 正向加密整型，只能接受整型
