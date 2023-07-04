@@ -101,14 +101,13 @@ class Code
     public static function create(array $option = [])
     {
         if (php_sapi_name() === 'cli') return null;
-        $dir = dirname(__DIR__, 2);
         $option += self::$option;
         $enFont = ['en' => [], 'cn' => []];
         foreach ($option['en_font'] as $i => $f) {
-            $enFont['en'][] = $dir . $f;
+            $enFont['en'][] = _FONT_ROOT . $f;
         }
         foreach ($option['cn_font'] as $i => $f) {
-            $enFont['cn'][] = $dir . $f;
+            $enFont['cn'][] = _FONT_ROOT . $f;
         }
         $option['en_font'] = array_flip($enFont['en']);
         $option['cn_font'] = array_flip($enFont['cn']);
