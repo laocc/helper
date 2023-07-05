@@ -559,7 +559,7 @@ final class BCG_FontPhp implements BCG_Font
             $gd = imagerotate($gd, $this->rotationAngle, 0);
             imagecopy($im, $gd, $x, $y, 0, 0, imagesx($gd), imagesy($gd));
         } else {
-            imagestring($im, $this->font, $x, $y, $this->text, $color);
+            imagestring($im, $this->font, intval($x), intval($y), $this->text, $color);
         }
     }
 }
