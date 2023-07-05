@@ -2343,7 +2343,7 @@ class qr_Image
             $pixelPerPoint = $width / $imgW;
         }
 
-        if (preg_match('/^([a-z]+)|(\#[a-f0-9]{3})|(\#[a-f0-9]{6})$/i', $option['background'])) {
+        if (preg_match('/^([a-z]+)|(\#[a-f\d]{3})|(\#[a-f\d]{6})$/i', $option['background'])) {
             $resource_im = \imagecreate($imgW, $imgH);
             $bgColor = Gd::createColor($resource_im, $option['background']);//二维码的背景色
             \imagefill($resource_im, 0, 0, $bgColor);//填充背景色

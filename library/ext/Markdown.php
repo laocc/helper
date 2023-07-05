@@ -301,7 +301,7 @@ class Markdown
 //        }, $text);
 
         // 单行`#000;#fff;value`注释,颜色分别为字体色、背景色，背景色可直接省略，但若省略字体色，必须有分号。
-        $cp = '\#(?:[a-f0-9]{3}|[a-f0-9]{6})';//颜色的正则表达式
+        $cp = '\#(?:[a-f\d]{3}|[a-f\d]{6})';//颜色的正则表达式
         $text = preg_replace_callback("/(?<hd>^|[^\\\])(`)(?<color>{$cp})?(?<fh>\;?)(?<bg>{$cp})?(?:\;?)(?<imp>\!?)(?<val>.+?)\\2/i", function ($matches) {
             $color = !!$matches['color'] ? "color:{$matches['color']};" : null;
             $bgcolor = !!$matches['bg'] ? "background:{$matches['bg']};" : null;
@@ -360,7 +360,7 @@ class Markdown
         }, $text);
 
         // encode unsafe tags
-        $text = preg_replace_callback("/<(\/?)([a-z0-9-]+)(\s+[^>]*)?>/i", function ($matches) use ($whiteList) {
+        $text = preg_replace_callback("/<(\/?)([a-z\d-]+)(\s+[^>]*)?>/i", function ($matches) use ($whiteList) {
             if (stripos('|' . self::$_commonWhiteList . '|' . $whiteList . '|', '|' . $matches[2] . '|') !== false) {
                 return self::makeHolder($matches[0]);
             } else {
@@ -447,11 +447,11 @@ class Markdown
 
         // strong and em and some fuck
         $text = self::parseInlineCallback($text);
-        $text = preg_replace("/<([_a-z0-9-\.\+]+@[^@]+\.[a-z]{2,})>/i", "<a href=\"mailto:\\1\">\\1</a>", $text);
+        $text = preg_replace("/<([_a-z\d-\.\+]+@[^@]+\.[a-z]{2,})>/i", "<a href=\"mailto:\\1\">\\1</a>", $text);
 
         // autolink url
         if ($enableAutoLink) {
-            $text = preg_replace("/(^|[^\"])((http|https|ftp|mailto):[x80-xff_a-z0-9-\.\/%#@\?\+=~\|\,&\(\)]+)($|[^\"])/i",
+            $text = preg_replace("/(^|[^\"])((http|https|ftp|mailto):[x80-xff\_a-z\d-\.\/%#@\?\+=~\|\,&\(\)]+)($|[^\"])/i",
                 "\\1<a href=\"\\2\" data-typ='420' target='_blank'>\\2</a>\\4", $text);
         }
 
@@ -578,7 +578,7 @@ class Markdown
 
             switch (true) {
                 // list，列表，以1.或a.开头
-                case preg_match("/^(\s*)((?:[0-9a-z]+\.)|\-|\+|\*)\s+/", $line, $matches):
+                case preg_match("/^(\s*)((?:[\da-z]+\.)|\-|\+|\*)\s+/", $line, $matches):
                     $space = strlen($matches[1]);
                     $emptyCount = 0;
 
@@ -946,7 +946,7 @@ class Markdown
 
         // count levels
         foreach ($lines as $key => &$line) {
-            if (preg_match("/^(\s*)((?:[0-9a-z]+\.?)|\-|\+|\*)(\s+)(.*)$/", $line, $matches)) {
+            if (preg_match("/^(\s*)((?:[\da-z]+\.?)|\-|\+|\*)(\s+)(.*)$/", $line, $matches)) {
                 $space = strlen($matches[1]);
                 $type = false !== strpos('+-*', $matches[2]) ? 'ul' : 'ol';
                 $minSpace = min($space, $minSpace);
@@ -1077,7 +1077,7 @@ class Markdown
                 list ($num, $text) = $column;
                 $tag = $head ? 'th' : 'td';
                 $bgcolor = $width = null;
-                $color = '\#(?:[a-f0-9]{6}|[a-f0-9]{3});';
+                $color = '\#(?:[a-f\d]{6}|[a-f\d]{3});';
                 if (preg_match("/^(?:({$color})|(?:(\d+);)|(?:(\d{1,3}px;))){1,2}(.*)$/i", $text, $matches)) {
                     $bgcolor = $matches[1];
                     $num = intval($matches[2]);

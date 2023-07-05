@@ -181,7 +181,7 @@ class Code
             $_code_len = is_int($opt['length']) ? $opt['length'] : mt_rand(...$opt['length']);
             $code = array_rand(array_flip(str_split(self::$disc[$opt['charset']], $cn ? 3 : 1)), $_code_len);
         } else {
-            $cn = !preg_match('/^[a-z0-9]+$/', $opt['code']);
+            $cn = !preg_match('/^[a-z\d]+$/', $opt['code']);
             $code = str_split($opt['code'], $cn ? 3 : 1);
             $_code_len = count($code);
         }

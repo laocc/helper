@@ -67,7 +67,7 @@ class Get extends Request
                 if (!preg_match('/^\d+(\.\d+)?$/', $value)) return '';
                 break;
             case 'alphanumeric':
-                if (!preg_match('/^[a-zA-Z0-9]+$/', $value)) return '';
+                if (!preg_match('/^[a-zA-Z\d]+$/', $value)) return '';
                 break;
             case 'mobile':
                 if (!preg_match('/^1\d{10}$/', $value)) return '';

@@ -11,26 +11,6 @@ abstract class Request
     protected string $_raw = '';
     protected array $_error = [];
     protected bool $_off = false;
-    protected $_min = PHP_INT_MIN;
-    protected $_max = PHP_INT_MAX;
-
-    /**
-     * 数字类：表示最大最小值
-     * 字串类：表示为最短最长
-     * @param int $value
-     * @return $this
-     */
-    public function min(int $value)
-    {
-        $this->_min = $value;
-        return $this;
-    }
-
-    public function max(int $value)
-    {
-        $this->_max = $value;
-        return $this;
-    }
 
     /**
      * 受理post时的原始数据，也就是file_get_contents('php://input')
@@ -50,46 +30,31 @@ abstract class Request
      */
     protected function errorNumber($number, int $type = 0): string
     {
-        $min = $this->_min;
-        $max = $this->_max;
-        if ($type === 1) {
-            $min = strtotime(strval($min));
-            $max = strtotime(strval($max));
-        } else if ($type === 2) {
-            $min = intval(floatval($min) * 100);
-            $max = intval(floatval($max) * 100);
+        $min = -1;
+        $max = 4294967295;
+
+        if ($type === 1) {//日期时间格式
+            $min = 0;
+            $max = strtotime('2100-12-31');
+        } else if ($type === 2) {//2位小数的金额
+//            $min = intval(floatval($min) * 100);
+//            $max = intval(floatval($max) * 100);
         }
 
-        if (!is_null($this->_min) && $min > $number) {
-            $this->_min = null;
-            $this->_max = null;
-            return "不能小于最小值({$this->_min})";
+        if ($min > 0 && $min > $number) {
+            return "不能小于最小值({$min})，当前={$number}";
         }
-        if (!is_null($this->_max) && $max < $number) {
-            $this->_min = null;
-            $this->_max = null;
-            return "不能大于最大值({$this->_max})";
+        if ($max > 0 && $max < $number) {
+            return "不能大于最大值({$max})，当前={$number}";
         }
-        $this->_min = null;
-        $this->_max = null;
+
         return '';
     }
 
-    protected function errorString($string): string
+    protected function errorString($string, int $maxLen = 0): string
     {
         $len = mb_strlen($string);
-        if (!is_null($this->_min) && $this->_min > $len) {
-            $this->_min = null;
-            $this->_max = null;
-            return "不能少于({$this->_min})个字";
-        }
-        if (!is_null($this->_max) && $this->_max < $len) {
-            $this->_min = null;
-            $this->_max = null;
-            return "不能多于({$this->_max})个字";
-        }
-        $this->_min = null;
-        $this->_max = null;
+        if ($maxLen && $maxLen < $len) return "不能多于({$maxLen})个字";
         return '';
     }
 
@@ -192,12 +157,6 @@ abstract class Request
             }
         } else {
             $val = $this->_data[$param] ?? $default;
-        }
-
-        if (is_null($val)) {
-            //只要是null值，后面会直接退出
-            $this->_min = null;
-            $this->_max = null;
         }
 
         $key = $keyName;

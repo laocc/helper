@@ -22,6 +22,11 @@ final class Post extends Request
 {
 
 
+    /**
+     * @param string $key
+     * @param int $xssLevel
+     * @return string
+     */
     public function string(string $key, int $xssLevel = 1): string
     {
         $value = $this->getData($key, $force);
@@ -30,19 +35,21 @@ final class Post extends Request
         if (is_array($value)) $value = json_encode($value, 256 | 64);
         $value = trim(strval($value));
 
-        if ($xssLevel === 1) {
+        if ($xssLevel === 1) {//简单过滤单引号
             $value = preg_replace('/["\']/', '', $value);
-
-        } elseif ($xssLevel === 2) {
+            $xssLevel = 0;
+        } elseif ($xssLevel === 2) {//过滤大部分符号
             $value = preg_replace('/[\"\'\%\&\^\$\#\(\)\[\]\{\}\?]/', '', $value);
+            $xssLevel = 0;
 
-        } else if ($xssLevel > 2) {
+        } else if ($xssLevel > 2) {//清除所有符号
             Xss::clear($value);
 
         }
 
         if (empty($value) && $force) $this->recodeError($key);
-        if ($chk = $this->errorString($value)) $this->recodeError($key, $chk);
+
+        if ($chk = $this->errorString($value, $xssLevel)) $this->recodeError($key, $chk);
 
         return $value;
     }
@@ -100,8 +107,6 @@ final class Post extends Request
      */
     public function filter(string $key, string ...$type): string
     {
-        $this->_min = null;
-        $this->_max = null;
         $value = $this->getData($key, $force);
         if (is_null($value)) return '';
         $value = trim($value);
@@ -250,8 +255,6 @@ final class Post extends Request
 
     public function bool(string $key): bool
     {
-        $this->_min = null;
-        $this->_max = null;
         $value = $this->getData($key, $force);
         if (is_null($value)) return false;
         if ($value === '' && $force) $this->recodeError($key);
@@ -277,8 +280,6 @@ final class Post extends Request
 
     public function match(string $key, string $pnt): string
     {
-        $this->_min = null;
-        $this->_max = null;
         if (!is_match($pnt)) esp_error('Post', "{$key} 传入的正则表达式不合法");
         $value = $this->getData($key, $force);
         if (is_null($value)) return '';
@@ -301,9 +302,6 @@ final class Post extends Request
      */
     public function json(string $key, int $options = 256 | 64): string
     {
-        $this->_min = null;
-        $this->_max = null;
-
         $value = $this->getData($key, $force);
         if (is_null($value)) return '';
         if (empty($value) && $force) $this->recodeError($key);
@@ -326,9 +324,6 @@ final class Post extends Request
      */
     public function xml(string $key, string $root = 'xml'): string
     {
-        $this->_min = null;
-        $this->_max = null;
-
         $value = $this->getData($key, $force);
         if (is_null($value)) return '';
 
@@ -352,9 +347,6 @@ final class Post extends Request
      */
     public function array(string $key, string $encode = 'json'): array
     {
-        $this->_min = null;
-        $this->_max = null;
-
         $value = $this->getData($key, $force);
         if (is_null($value)) return [];
 

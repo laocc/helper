@@ -53,7 +53,6 @@ final class Xss
      */
     public static function clear(string &$str, bool $is_image = false): bool
     {
-        if (is_array($str)) return array_map('self::clear', $str);
         $str = trim($str);
         if (empty($str)) return false;
         if (is_numeric($str)) return false;
@@ -65,7 +64,7 @@ final class Xss
         //清除掉字符串中无效的字符
         $kill = Array();
         $kill[] = '/%0[0-8bcef]/i';    // url encoded 00-08, 11, 12, 14, 15
-        $kill[] = '/%1[0-9a-f]/i';    // url encoded 16-31
+        $kill[] = '/%1[\da-f]/i';    // url encoded 16-31
         $kill[] = '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+/s';    // 00-08, 11, 12, 14-31, 127
         do {
             $str = preg_replace($kill, '', $str, -1, $count);
@@ -74,10 +73,10 @@ final class Xss
         //URL 解码,循环执行以防止多次URL编码的内容
         do {
             $str = rawurldecode($str);
-        } while (preg_match('/%[0-9a-f]{2,}/i', $str));
+        } while (preg_match('/%[\da-f]{2,}/i', $str));
 
         //转换HTML实体
-        $str = preg_replace_callback("/[^a-z0-9>]+[a-z0-9]+=([\'|\"]).*?\\1/is", function ($match) {
+        $str = preg_replace_callback("/[^a-z\d>]+[a-z\d]+=([\'|\"]).*?\\1/is", function ($match) {
             return str_replace(['>', '<', '\\'], ['&gt;', '&lt;', '\\\\'], $match[0]);
         }, $str);
 
@@ -113,7 +112,7 @@ final class Xss
         do {
             $original = $str;
             if (preg_match('/<a/i', $str)) {
-                $str = preg_replace_callback('/<a[^a-z0-9>]+([^>]*?)(?:>|$)/is', function ($match) {
+                $str = preg_replace_callback('/<a[^a-z\d>]+([^>]*?)(?:>|$)/is', function ($match) {
                     return str_replace($match[1],
                         preg_replace('/href=.*?(?:(?:alert|prompt|confirm)(?:\(|&\#40;)|javascript:|livescript:|mocha:|charset=|window\.|document\.|\.cookie|<script|<xss|data\s*:)/is',
                             '',
@@ -124,7 +123,7 @@ final class Xss
             }
 
             if (preg_match('/<img/i', $str)) {
-                $str = preg_replace_callback('/\<img[^a-z0-9]+([^>]*?)(?:\s\?\/\?\>\|\$)/is', function ($match) {
+                $str = preg_replace_callback('/\<img[^a-z\d]+([^>]*?)(?:\s\?\/\?\>\|\$)/is', function ($match) {
                     return str_replace($match[1],
                         preg_replace('/src=.*?(?:(?:alert|prompt|confirm)(?:\(|&\#40;)|javascript:|livescript:|mocha:|charset=|window\.|document\.|\.cookie|<script|<xss|base64\s*,)/is',
                             '',

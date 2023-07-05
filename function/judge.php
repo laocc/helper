@@ -71,7 +71,7 @@ function is_url(string $value): bool
 function is_alphanumeric(string $value): bool
 {
     if (empty($value)) return false;
-    return (bool)preg_match("/^[a-z0-9]+$/i", $value);
+    return (bool)preg_match("/^[a-z\d]+$/i", $value);
 }
 
 /**
@@ -93,7 +93,7 @@ function is_cn(string $value): bool
 function is_cen(string $value): bool
 {
     if (empty($value)) return false;
-    return (bool)preg_match("/^[\x{4e00}-\x{9fa5}a-z0-9]+$/iu", $value);
+    return (bool)preg_match("/^[\x{4e00}-\x{9fa5}a-z\d]+$/iu", $value);
 }
 
 /**

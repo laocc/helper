@@ -640,7 +640,7 @@ function utf8(string $str): string
  */
 function unicode_decode(string $code): string
 {
-    return preg_replace_callback('/\\\\u([0-9a-f]{4})/i', function ($matches) {
+    return preg_replace_callback('/\\\\u([\da-f]{4})/i', function ($matches) {
         return mb_convert_encoding(pack("H*", $matches[1]), "UTF-8", "UCS-2BE");
     }, $code);
 }
