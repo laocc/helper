@@ -360,7 +360,7 @@ class Markdown
         }, $text);
 
         // encode unsafe tags
-        $text = preg_replace_callback("/<(\/?)([a-z\d-]+)(\s+[^>]*)?>/i", function ($matches) use ($whiteList) {
+        $text = preg_replace_callback("/<(\/?)([a-z\d\-]+)(\s+[^>]*)?>/i", function ($matches) use ($whiteList) {
             if (stripos('|' . self::$_commonWhiteList . '|' . $whiteList . '|', '|' . $matches[2] . '|') !== false) {
                 return self::makeHolder($matches[0]);
             } else {
@@ -447,11 +447,11 @@ class Markdown
 
         // strong and em and some fuck
         $text = self::parseInlineCallback($text);
-        $text = preg_replace("/<([_a-z\d-\.\+]+@[^@]+\.[a-z]{2,})>/i", "<a href=\"mailto:\\1\">\\1</a>", $text);
+        $text = preg_replace("/<([_a-z\d\-\.\+]+@[^@]+\.[a-z]{2,})>/i", "<a href=\"mailto:\\1\">\\1</a>", $text);
 
         // autolink url
         if ($enableAutoLink) {
-            $text = preg_replace("/(^|[^\"])((http|https|ftp|mailto):[x80-xff\_a-z\d-\.\/%#@\?\+=~\|\,&\(\)]+)($|[^\"])/i",
+            $text = preg_replace("/(^|[^\"])((http|https|ftp|mailto):[x80-xff\_a-z\d\-\.\/%#@\?\+=~\|\,&\(\)]+)($|[^\"])/i",
                 "\\1<a href=\"\\2\" data-typ='420' target='_blank'>\\2</a>\\4", $text);
         }
 

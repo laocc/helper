@@ -254,7 +254,7 @@ function is_ip(string $value, string $which = 'ipv4'): bool
 function is_domain(string $value): bool
 {
     if (empty($value)) return false;
-    return (boolean)preg_match('/^(?=^.{3,255}$)([a-z\d][a-z\d-]{0,62}\.)+[a-z]{2,10}$/i', $value);
+    return (boolean)preg_match('/^(?=^.{3,255}$)([a-z\d][a-z\d\-]{0,62}\.)+[a-z]{2,10}$/i', $value);
 }
 
 /**
