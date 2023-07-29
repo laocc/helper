@@ -83,7 +83,7 @@ final class Paging
         if ($this->size === 0) return;
         if ($count > 0) $this->recode = $count;
         $this->last = intval($this->recode % $this->size);//最后一页数
-        $this->total = ceil($this->recode / $this->size);
+        $this->total = intval(ceil($this->recode / $this->size));
         $this->isTake = $isTake;
     }
 
