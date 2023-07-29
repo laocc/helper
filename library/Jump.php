@@ -17,7 +17,7 @@ namespace esp\helper\library;
  */
 final class Jump
 {
-    private $token = '0ad4b59c4cbf7423a8e7f4cf178ab11a';
+    private string $token = '0ad4b59c4cbf7423a8e7f4cf178ab11a';
 
     public function __construct(string $token = '')
     {

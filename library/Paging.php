@@ -10,17 +10,17 @@ namespace esp\helper\library;
  */
 final class Paging
 {
-    public $index_key = 'page';       //分页，页码键名，可以任意命名，只要不和常用的别的键冲突就可以
-    public $size_key = 'size';       //分页，每页数量
-    public $index = 1;//当前页码
-    public $size = 0;//每页数量
-    public $recode = 0;//当前批次记录数
-    public $total = 0;//总页数
-    public $last = 0;//最后一页剩余的记录数
-    public $sum = [];
+    public string $index_key = 'page';       //分页，页码键名，可以任意命名，只要不和常用的别的键冲突就可以
+    public string $size_key = 'size';       //分页，每页数量
+    public int $index = 1;//当前页码
+    public int $size = 0;//每页数量
+    public int $recode = 0;//当前批次记录数
+    public int $total = 0;//总页数
+    public int $last = 0;//最后一页剩余的记录数
+    public array $sum = [];
 
-    private $autoSize = 10;
-    private $isTake = false;
+    private int $autoSize = 10;
+    private bool $isTake = false;
 
     public function __construct(int $sizeDefault = 0, int $index = 0, int $recode = null)
     {

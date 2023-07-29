@@ -104,6 +104,7 @@ function moveTransfer(string $path, bool $show = true)
     $dir = new \DirectoryIterator($path);
     $array = array();
     foreach ($dir as $i => $f) {
+        if ($f->isDot()) continue;
         if ($i > 100) break;
         if ($f->isFile()) $array[] = $f->getFilename();
     }

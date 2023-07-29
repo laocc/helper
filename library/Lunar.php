@@ -92,7 +92,7 @@ class Lunar
      * @param int  date 公历-日
      * @return array
      */
-    function convertSolarToLunar(int $year, int $month, int $date)
+    public function convertSolarToLunar(int $year, int $month, int $date)
     {
         $yearData = $this->lunarInfo[$year - $this->MIN_YEAR];
         if ($year == $this->MIN_YEAR && $month <= 2 && $date <= 9) {
@@ -110,7 +110,7 @@ class Lunar
      * @param int date 阴历-日
      * @return array
      */
-    function convertLunarToSolar(int $year, int $month, int $date)
+    public function convertLunarToSolar(int $year, int $month, int $date)
     {
         $yearData = $this->lunarInfo[$year - $this->MIN_YEAR];
         $between = $this->getDaysBetweenLunar($year, $month, $date);

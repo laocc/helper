@@ -18,13 +18,12 @@ class Fso
         $array = array();
         $dir = new \DirectoryIterator($path);
         foreach ($dir as $f) {
+            if ($f->isDot()) continue;
             if (!$f->isDir()) continue;
-            $name = $f->getFilename();
-            if ($name === '.' or $name === '..') continue;
             if ($fullPath) {
                 $array[] = $f->getPathname();
             } else {
-                $array[] = $name;
+                $array[] = $f->getFilename();
             }
         }
         return $array;
@@ -44,6 +43,7 @@ class Fso
         if (is_string($ext)) $ext = [$ext];
         if (!empty($ext)) foreach ($ext as $i => $t) $ext[$i] = ltrim($t, '.');
         foreach ($dir as $f) {
+            if ($f->isDot()) continue;
             if (!$f->isFile()) continue;
             if ($ext) {
                 if (in_array($f->getExtension(), $ext)) $array[] = $f->getFilename();
