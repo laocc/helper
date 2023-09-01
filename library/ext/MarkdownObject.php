@@ -10,91 +10,27 @@ namespace esp\helper\library\ext;
  */
 class MarkdownObject
 {
-    /**
-     * _whiteList
-     *
-     * @var string
-     */
-    private $_commonWhiteList = 'kbd|b|i|strong|em|sup|sub|br|code|del|a|hr|small';
-
-    /**
-     * _specialWhiteList
-     *
-     * @var mixed
-     * @access private
-     */
-    private $_specialWhiteList = ['table' => 'table|tbody|thead|tfoot|tr|td|th', 'div' => ''];
-
-    /**
-     * _footnotes
-     *
-     * @var array
-     */
-    private $_footnotes;
-
-    /**
-     * _blocks
-     *
-     * @var array
-     */
-    private $_blocks;
-
-    /**
-     * _current
-     *
-     * @var string
-     */
-    private $_current;
-
-    /**
-     * _pos
-     *
-     * @var int
-     */
-    private $_pos;
-
-    /**
-     * _definitions
-     *
-     * @var array
-     */
-    private $_definitions;
-
-    /**
-     * @var array
-     */
-    private $_hooks = array();
-
-    /**
-     * @var array
-     */
-    private $_holders;
-
-    /**
-     * @var string
-     */
-    private $_uniqid;
-
-    /**
-     * @var int
-     */
-    private $_id;
-
-
-    /**
-     * 所有锚点
-     * @var array
-     * $this->href[] = ['lv' => $num, 'name' => $name, 'title' => $line];
-     */
-    private $href = array();
-
-    private $addNav = false;
-
-    private $conf;
+    private string $_commonWhiteList = 'kbd|b|i|strong|em|sup|sub|br|code|del|a|hr|small';
+    private array $_specialWhiteList = ['table' => 'table|tbody|thead|tfoot|tr|td|th', 'div' => ''];
+    private array $_footnotes;
+    private array $_blocks;
+    private string $_current;
+    private int $_pos;
+    private array $_definitions;
+    private array $_hooks = array();
+    private array $_holders;
+    private string $_uniqID;
+    private int $_id;
+    private array $_html = array();
+    private array $href = array();//所有锚点 $this->href[] = ['lv' => $num, 'name' => $name, 'title' => $line];
+    private bool $addNav = false;
+    private bool $buildHref;
+    private array $conf;
 
     public function __construct(array $conf = [])
     {
         $this->conf = $conf;
+        $this->buildHref = boolval($conf['buildHref'] ?? 1);
     }
 
     /**
@@ -110,9 +46,9 @@ class MarkdownObject
         $this->_definitions = array();
         $this->_holders = array();
         $this->_html = array();
-        $this->_uniqid = md5(uniqid());
+        $this->_uniqID = md5(uniqid());
         $this->_id = 0;
-        if (isset($this->conf['addNav']) and is_null($addNav)) $addNav = boolval($this->conf['addNav']);
+        if (is_null($addNav)) $addNav = boolval($this->conf['addNav'] ?? 0);
         $this->addNav = boolval($addNav);
         $this->replaceHtml($text);//优先处理<<<html>>>
         $text = str_replace(["\t", "\r"], ['    ', ''], $text);
@@ -124,15 +60,13 @@ class MarkdownObject
             ($addBoth ? '<div style="display: block;width:100%;height:100px;clear: both;"></div>' : '');
     }
 
-    private $_html = array();
-
     /**
      * 处理<<<HTML代码>>>
-     * @param $text
+     * @param string $text
      */
     private function replaceHtml(string &$text)
     {
-        $text = preg_replace_callback("/\<{3}(?<pre>\w*)\s+(?<html>.+?)\>{3}/is", function ($matches) {
+        $text = preg_replace_callback("/<{3}(?<pre>\w*)\s+(?<html>.+?)>{3}/is", function ($matches) {
             $id = mt_rand();
             $this->_html[$id] = $matches['html'];
             return "[html:{$id}]" . (!!$matches['pre'] ? ("相关源码如下：\n```{$matches['pre']}\n{$matches['html']}\n```\n") : '');
@@ -145,11 +79,11 @@ class MarkdownObject
      */
     private function joinHtml(&$html)
     {
-        $html = preg_replace_callback("/\((br|hr){1}\)/i", function ($matches) {
+        $html = preg_replace_callback("/\((br|hr)\)/i", function ($matches) {
             return "<{$matches[1]}>";
         }, $html);
 
-        $html = preg_replace_callback("/\[html\:(\d+)\]/i", function ($matches) {
+        $html = preg_replace_callback("/\[html:(\d+)\]/i", function ($matches) {
             return $this->_html[$matches[1]] . '<br>';
         }, $html);
     }
@@ -186,7 +120,7 @@ class MarkdownObject
      */
     private function makeHolder($str)
     {
-        $key = "|\r" . $this->_uniqid . $this->_id . "\r|";
+        $key = "|\r" . $this->_uniqID . $this->_id . "\r|";
         $this->_id++;
         $this->_holders[$key] = $str;
         return $key;
@@ -226,7 +160,7 @@ class MarkdownObject
      * @param string $text
      * @return string
      */
-    private function parse($text)
+    private function parse(string $text)
     {
         $blocks = $this->parseBlock($text, $lines);
         $html = array();
@@ -297,7 +231,7 @@ class MarkdownObject
      * @param bool $enableAutoLink
      * @return string
      */
-    private function parseInline($text, $whiteList = '', $clearHolders = true, $enableAutoLink = true)
+    private function parseInline(string $text, string $whiteList = '', bool $clearHolders = true, bool $enableAutoLink = true)
     {
         $text = $this->call('beforeParseInline', ($text));
 //        $text = str_replace('\\', '\\\\', $text);
@@ -310,7 +244,7 @@ class MarkdownObject
 
         // 单行`#000;#fff;value`注释,颜色分别为字体色、背景色，背景色可直接省略，但若省略字体色，必须有分号。
         $cp = '\#(?:[a-f\d]{3}|[a-f\d]{6})';//颜色的正则表达式
-        $text = preg_replace_callback("/(?<hd>^|[^\\\])(`)(?<color>{$cp})?(?<fh>\;?)(?<bg>{$cp})?(?:\;?)(?<imp>\!?)(?<val>.+?)\\2/i", function ($matches) {
+        $text = preg_replace_callback("/(?<hd>^|[^\\\])(`)(?<color>{$cp})?(?<fh>;?)(?<bg>{$cp})?(?:;?)(?<imp>\!?)(?<val>.+?)\\2/i", function ($matches) {
             $color = !!$matches['color'] ? "color:{$matches['color']};" : null;
             $bgcolor = !!$matches['bg'] ? "background:{$matches['bg']};" : null;
             $style = (!!$color or !!$bgcolor) ?
@@ -322,16 +256,19 @@ class MarkdownObject
 
             //htmlspecialchars
             $span = ($matches['val']);
-            if ($this->conf['link'] ?? 1) {
+            if ($this->buildHref) {
                 if (\esp\helper\is_url($span)) $span = "<a href='{$span}' target='_blank'>{$span}</a>";
                 else if (\esp\helper\is_domain($span)) $span = "<a href='http://{$span}' target='_blank'>{$span}</a>";
+            } else {
+                if (\esp\helper\is_url($span)) $span = "<span class='code'>{$span}</span>";
+                else if (\esp\helper\is_domain($span)) $span = "<span class='code'>{$span}</span>";
             }
 
             return $matches['hd'] . $this->makeHolder("<span {$style} data-line='328'>{$span}</span>");
         }, $text);
 
 //        // 单行``注释
-        $text = preg_replace_callback("/(^|[^\\\])\<(?<style>[\w\;\-\:\#\.\% ]+?)?\>(?<val>.+?)\<\/\>/", function ($matches) {
+        $text = preg_replace_callback("/(^|[^\\\])<(?<style>[\w;\-:#.% ]+?)?>(?<val>.+?)<\/>/", function ($matches) {
             return $matches[1] . $this->makeHolder("<span style='{$matches['style']}' data-line='324'>" . htmlspecialchars($matches['val']) . '</span>');
         }, $text);
 
@@ -343,17 +280,17 @@ class MarkdownObject
 
 
         //@@@
-        $text = preg_replace_callback("/(^|[^\\\])(\@{3})\s*(.+?)\s*\\2/", function ($matches) {
+        $text = preg_replace_callback("/(^|[^\\\])(@{3})\s*(.+?)\s*\\2/", function ($matches) {
             return $matches[1] . $this->makeHolder('<div class="notes"><h2>Notes:</h2><div>' . htmlspecialchars($matches[3]) . '</div></div>');
         }, $text);
 
         //<name>锚链，链接到锚链：[title](#name)
-        $text = preg_replace_callback("/(^|[^\\\])\<:([\w]+?)\>/", function ($matches) {
+        $text = preg_replace_callback("/(^|[^\\\])<:(\w+?)>/", function ($matches) {
             return $matches[1] . $this->makeHolder("<a name='{$matches[2]}' target='_self'></a>");
         }, $text);
 
         // 加载文件
-        $text = preg_replace_callback("/<(?:file|include|load)\:(.+?)>/i", function ($matches) {
+        $text = preg_replace_callback("/<(?:file|include|load):(.+?)>/i", function ($matches) {
             $file = _ROOT . '/' . trim($matches[1], '/"\'');
             if (!is_file($file)) return $file;
             return $this->makeHolder(file_get_contents($file));
@@ -367,13 +304,22 @@ class MarkdownObject
         // link
         $text = preg_replace_callback("/<(?:href)\:(.+?)>/i", function ($matches) {
             $url = str_replace(['_HTTP', '_DOMAIN'], [((_HTTPS ? 'https:' : 'http:') . '//'), _DOMAIN], $matches[1]);
-//            return ("<a href=\"{$url}\" data-typ='349' target='_blank'>{$url}</a>");
-            return $this->makeHolder("<a href=\"{$url}\" data-typ='349' target='_blank'>{$url}</a>");
+            if ($this->buildHref) {
+                $span = "<a href=\"{$url}\" data-typ='302' target='_blank'>{$url}</a>";
+            } else {
+                $span = "<span class='code'>{$url}</span>";
+            }
+            return $this->makeHolder($span);
         }, $text);
 
         // link
         $text = preg_replace_callback("/<(https?:\/\/.+)>/i", function ($matches) {
-            return $this->makeHolder("<a href=\"{$matches[1]}\" data-typ='349' target='_blank'>{$matches[1]}</a>");
+            if ($this->buildHref) {
+                $span = "<a href=\"{$matches[1]}\" data-typ='307' target='_blank'>{$matches[1]}</a>";
+            } else {
+                $span = "<span class='code'>{$matches[1]}</span>";
+            }
+            return $this->makeHolder($span);
         }, $text);
 
         // encode unsafe tags
@@ -435,13 +381,21 @@ class MarkdownObject
                 $target = ' class="parent"';
                 $url = substr($url, 1);
             }
-            return $this->makeHolder("<a href=\"{$url}\" {$target} data-typ='436'>{$escaped}</a>");
+            if ($this->buildHref) {
+                $link = "<a href=\"{$url}\" {$target} data-typ='369'>{$escaped}</a>";
+            } else {
+                $link = "<span class='code'>{$escaped}</span>";
+            }
+            return $this->makeHolder($link);
         }, $text);
 
         $text = preg_replace_callback("/\[((?:[^\]]|\\]|\\[)+?)\]\[((?:[^\]]|\\]|\\[)+?)\]/", function ($matches) {
             $escaped = $this->parseInline($this->escapeBracket($matches[1]), '', false, false);
-            $result = isset($this->_definitions[$matches[2]]) ?
-                ("<a href=\"" . $this->_definitions[$matches[2]] . "\" data-typ='403'>{$escaped}</a>") : $escaped;
+            if (isset($this->_definitions[$matches[2]])) {
+                $result = "<a href=\"" . $this->_definitions[$matches[2]] . "\" data-typ='375'>{$escaped}</a>";
+            } else {
+                $result = $escaped;
+            }
 
             return $this->makeHolder($result);
         }, $text);
@@ -468,8 +422,12 @@ class MarkdownObject
 
         // autolink url
         if ($enableAutoLink) {
-            $text = preg_replace("/(^|[^\"])((http|https|ftp|mailto):[x80-xff_a-z\d\-\.\/%#@\?\+=~\|\,&\(\)]+)($|[^\"])/i",
-                "\\1<a href=\"\\2\" data-typ='420' target='_blank'>\\2</a>\\4", $text);
+            if ($this->buildHref) {
+                $rTo = "\\1<a href=\"\\2\" data-typ='403' target='_blank'>\\2</a>\\4";
+            } else {
+                $rTo = "\\1<span class='code'>\\2</span>\\4";
+            }
+            $text = preg_replace("/(^|[^\"])((http|https|ftp|mailto):[x80-xff_a-z\d\-\.\/%#@\?\+=~\|\,&\(\)]+)($|[^\"])/i", $rTo, $text);
         }
 
         $text = $this->call('afterParseInlineBeforeRelease', $text);
@@ -531,7 +489,7 @@ class MarkdownObject
      * @param array $lines
      * @return array
      */
-    private function parseBlock($text, &$lines)
+    private function parseBlock(string $text, &$lines)
     {
         $lines = explode("\n", $text);
         $this->_blocks = array();
@@ -560,7 +518,7 @@ class MarkdownObject
                     $isAfterList = false;
                     if ($this->isBlock('list')) {
                         $space = $block[3];
-                        $isAfterList = ($space > 0 and strlen($matches[1]) >= $space) or strlen($matches[1]) > $space;
+                        $isAfterList = ($space > 0 and strlen($matches[1]) >= $space);
                     }
                     $this->startBlock('code', $key, [$matches[1], $matches[3], $isAfterList]);
                 }
@@ -795,8 +753,8 @@ class MarkdownObject
         $blocks = $this->call('beforeOptimizeBlocks', $blocks, $lines);
 
         foreach ($blocks as $key => &$block) {
-            $prevBlock = isset($blocks[$key - 1]) ? $blocks[$key - 1] : NULL;
-            $nextBlock = isset($blocks[$key + 1]) ? $blocks[$key + 1] : NULL;
+            $prevBlock = $blocks[$key - 1] ?? NULL;
+            $nextBlock = $blocks[$key + 1] ?? NULL;
 
             list ($type, $from, $to) = $block;
 
@@ -1209,7 +1167,7 @@ class MarkdownObject
     private function parseHtml(array $lines, $type)
     {
         foreach ($lines as &$line) {
-            $line = $this->parseInline($line, isset($this->_specialWhiteList[$type]) ? $this->_specialWhiteList[$type] : '');
+            $line = $this->parseInline($line, $this->_specialWhiteList[$type] ?? '');
         }
         return implode("\n", $lines);
     }
@@ -1255,7 +1213,7 @@ class MarkdownObject
      */
     private function isBlock($type, $value = NULL)
     {
-        return $this->_current == $type and (NULL === $value ? true : $this->_blocks[$this->_pos][3] == $value);
+        return $this->_current == $type and (NULL === $value || $this->_blocks[$this->_pos][3] == $value);
     }
 
     /**
@@ -1265,7 +1223,7 @@ class MarkdownObject
      */
     private function getBlock()
     {
-        return isset($this->_blocks[$this->_pos]) ? $this->_blocks[$this->_pos] : NULL;
+        return $this->_blocks[$this->_pos] ?? NULL;
     }
 
     /**
