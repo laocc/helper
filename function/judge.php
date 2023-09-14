@@ -17,16 +17,18 @@ function is_mob(string $value): bool
 /**
  * 电话号码格式
  * @param string $value
+ * @param int $mode
  * @return bool
  */
-function is_phone(string $value): bool
+function is_phone(string $value, int $mode = 63): bool
 {
     if (empty($value)) return false;
-    return (boolean)preg_match('/^1[3456789]\d{9}$/', $value) or //手机号格式
-        (boolean)preg_match('/^0\d{2,3}(-|\x20)?\d{7,8}$/', $value) or //010-12388855
-        (boolean)preg_match('/^0\d{2,3}(-|\x20)?\d{7,8}(-|\x20)\d{1,5}$/', $value) or //区号+号码+分号
-        (boolean)preg_match('/^0\d{10,11}$/', $value) or //01025456365
-        (boolean)preg_match('/^400(-|\x20)?\d{7,8}$/', $value); //400电话
+    return (($mode & 1) && (boolean)preg_match('/^1[3456789]\d{9}$/', $value)) or //手机号格式
+        (($mode & 2) && (boolean)preg_match('/^1[3456789]\d{9}[\_\-\+]\d{3,4}$/', $value)) or //手机号-分机号
+        (($mode & 4) && (boolean)preg_match('/^0\d{2,3}(-|\x20)?\d{7,8}$/', $value)) or //010-12388855
+        (($mode & 8) && (boolean)preg_match('/^0\d{2,3}(-|\x20)?\d{7,8}(-|\x20)\d{1,5}$/', $value)) or //区号+号码+分号
+        (($mode & 16) && (boolean)preg_match('/^0\d{10,11}$/', $value)) or //01025456365
+        (($mode & 32) && (boolean)preg_match('/^400(-|\x20)?\d{7,8}$/', $value)); //400电话
 }
 
 /**
