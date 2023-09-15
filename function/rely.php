@@ -192,8 +192,12 @@ function mk_dir(string $path, int $mode = 0744, array $trace = null): bool
     } else if ($check !== '/') $path = dirname($path);
 
     return locked('2mkdir', function ($path, $mode) {
-        if (!file_exists($path)) @mkdir($path, $mode ?: 0740, true);
-        return true;
+        try {
+            if (!file_exists($path)) @mkdir($path, $mode ?: 0740, true);
+            return true;
+        } catch (\Exception|\Error $error) {
+            return false;
+        }
     }, $path, $mode);
 }
 

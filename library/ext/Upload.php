@@ -31,12 +31,13 @@ namespace esp\helper\library\ext;
 
 */
 
-use esp\helper\library\gd\Image;
+use esp\error\Error;
+use esp\gd\gd\Image;
 use function esp\helper\mk_dir;
 
 final class Upload
 {
-    private $option = null;
+    private array $option;
 
     public function __construct(array $option = [])
     {
@@ -289,8 +290,9 @@ final class Upload
 
     /**
      * 创建文件名称相关数据
-     * @param $ext
+     * @param string $ext
      * @return array
+     * @throws Error
      */
     private function filename(string $ext): array
     {
