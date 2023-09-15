@@ -153,9 +153,7 @@ function locked(string $lockKey, callable $callable, ...$args)
     if (flock($fn, $operation)) {//加锁
         try {
             $rest = $callable(...$args);//执行
-        } catch (\Exception $exception) {
-            $rest = 'locked: ' . $exception->getMessage();
-        } catch (Error $error) {
+        } catch (\Exception|\Error $error) {
             $rest = 'locked: ' . $error->getMessage();
         }
         flock($fn, LOCK_UN);//解锁

@@ -189,7 +189,7 @@ function is_json(string $value): bool
     try {
         $a = json_decode($value, true);
         if (!is_array($a)) return false;
-    } catch (\Error $exception) {
+    } catch (\Error|\Exception $exception) {
         return false;
     }
     return true;
