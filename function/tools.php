@@ -121,7 +121,7 @@ function moveTransfer(string $path, bool $show = true)
             }
             mk_dir($move);
             rename("{$path}/{$file}", $move);
-        } catch (Error $e) {
+        } catch (\Error|\Exception $e) {
             print_r(['moveTransfer' => $e]);
         }
     }
