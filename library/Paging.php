@@ -39,6 +39,12 @@ final class Paging
         return $this;
     }
 
+    public function recode(int $recode): Paging
+    {
+        $this->recode = $recode;
+        return $this;
+    }
+
     public function size(int $size): Paging
     {
         $this->size = $size;
