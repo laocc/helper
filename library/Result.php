@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace esp\helper\library;
 
-
+use esp\dbs\library\Paging;
 use function esp\core\esp_error;
 
 /**
