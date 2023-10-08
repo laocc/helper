@@ -155,6 +155,8 @@ class Result
     {
         if (is_null($value)) {
             unset($this->_update[$key]);
+        } else if (is_array($value) and isset($this->_update[$key])) {
+            $this->_update[$key] = $value + $this->_update[$key];
         } else {
             $this->_update[$key] = $value;
         }
