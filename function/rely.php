@@ -8,35 +8,30 @@ use esp\helper\library\ext\Xml;
 /**
  * 查询域名的根域名，兼容国别的二级域名
  * @param string $domain
- * @param null $branch
+ * @param int $right
  * @return string
  */
-function host(string $domain, $branch = null): string
+function host(string $domain, int $right = 0): string
 {
     if (empty($domain)) return '';
     if (strpos($domain, '/')) $domain = explode('/', "{$domain}//")[2];
-    if (!is_null($branch)) {
-        if (is_int($branch)) return implode('.', array_slice(explode('.', $domain), 0 - $branch));
-        if (is_string($branch)) $branch = explode(',', str_replace(';', ',', $branch));
-        foreach ($branch as $bch) {
-            if (stripos($domain, $bch)) {
-                $bv = str_replace('.', '\.', $bch);
-                $p2 = "/^(?:[\w\.\-]+\.)?([a-z\d]+)\.({$bv})$/i";
-                if (preg_match($p2, $domain, $match)) return "{$match[1]}.{$match[2]}";
-            }
-        }
+    $domainArr = explode('.', $domain);
+    $sc = count($domainArr);
+    if ($sc < 3) return $domain;//小于3节，直接返回原样
+    if ($sc === 3) return "{$domainArr[1]}.{$domainArr[2]}";//只有3节返回后2节
+
+    if ($right) {
+        if ($right > $sc) $right = $sc;
+        return "{$domainArr[$right-2]}.{$domainArr[$right-1]}";
     }
 
     $p1 = "/^(?:[\w\.\-]+\.)?([a-z]+)\.(com|net|org|gov|idv|co|name)\.(cn|cm|my|ph|tw|uk|hk)$/i";
-    $p2 = "/^(?:[\w\.\-]+\.)?([a-z\d]+)\.([a-z]+)$/i";
+//    $p2 = "/^(?:[\w\.\-]+\.)?([a-z\d]+)\.([a-z]+)$/i";
     if (preg_match($p1, $domain, $match)) {
         return "{$match[1]}.{$match[2]}.{$match[3]}";
-
-    } elseif (preg_match($p2, $domain, $match)) {
-        return "{$match[1]}.{$match[2]}";
     }
 
-    return '';
+    return "{$domainArr[$sc-2]}.{$domainArr[$sc-1]}";//其他情况都返回后2节
 }
 
 /**
