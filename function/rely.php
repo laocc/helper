@@ -8,10 +8,10 @@ use esp\helper\library\ext\Xml;
 /**
  * 查询域名的根域名，兼容国别的二级域名
  * @param string $domain
- * @param int $right
+ * @param int|null $right
  * @return string
  */
-function host(string $domain, int $right = 0): string
+function host(string $domain, int $right = null): string
 {
     if (empty($domain)) return '';
     if (strpos($domain, '/')) $domain = explode('/', "{$domain}//")[2];
