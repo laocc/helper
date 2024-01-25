@@ -168,7 +168,6 @@ function locked(string $lockKey, callable $callable, ...$args)
  * x    exec    1
  *
  * 通过PHP建立的文件夹权限一般为0744就可以了
- *
  * 若php-fpm由www账号运行，且目录有可能需要写入，则需要将此目录改为0777，或chown为www账号
  *
  * @param string $path 若不是以/结尾，则会向上缩一级
