@@ -158,6 +158,8 @@ function is_date(string $value): bool
             return checkdate($mac[2], $mac[3], $mac[1]);
         } elseif (preg_match('/^(\d{4})(\d{1,2})(\d{1,2})$/', $value, $mac)) {
             return checkdate($mac[2], $mac[3], $mac[1]);
+        } elseif (preg_match('/^(\d{4})年(\d{1,2})月(\d{1,2})日$/', $value, $mac)) {
+            return checkdate($mac[2], $mac[3], $mac[1]);
         } else {
             return false;
         }
