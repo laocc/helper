@@ -110,21 +110,27 @@ function diff_time(int $a, int $b): string
 
 function date_diffs(int $timeA, int $timeB): string
 {
+    $fy = '';
     $time = $timeA - $timeB;
+    if ($time < 0) {
+        $time = abs($time);
+        $fy = '-';
+    }
     if ($time < 86400) {
         if ($time < 60) {
-            return "{$time}秒";
+            return "{$fy}{$time}秒";
         } elseif ($time < 3600) {
-            return intval($time / 60) . '分' . ($time % 60) . '秒';
+            return $fy . intval($time / 60) . '分' . ($time % 60) . '秒';
         } else {
-            return intval($time / 3660) . '小时' . intval(($time % 3600) / 60) . '分';
+            return $fy . intval($time / 3660) . '小时' . intval(($time % 3600) / 60) . '分';
         }
     } else if ($time > 2592000) {
-        return intval($time / 86400) . '天';
+        return $fy . intval($time / 86400) . '天';
     } else {
-        return intval($time / 86400) . '天' . intval(($time % 86400) / 3600) . '小时';
+        return $fy . intval($time / 86400) . '天' . intval(($time % 86400) / 3600) . '小时';
     }
 }
+
 
 
 /**
