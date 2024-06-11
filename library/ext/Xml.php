@@ -7,9 +7,23 @@ use XMLWriter;
 
 final class Xml
 {
-    private $value;
-    private $notes;
-    private $cData = true;
+    private array $value;
+    private string $notes;
+    private bool $cData = true;
+
+    /**
+     * Xml constructor.
+     * @param $value
+     * @param string $notes
+     */
+    public function __construct($value, string $notes = 'xml')
+    {
+        if (is_array($notes) and is_string($value)) list($value, $notes) = [$notes, $value];
+        if (!is_array($value)) throw new Error('XML数据要求为数组格式');
+        if (!preg_match('/^[a-z]+$/i', $notes)) throw new Error('XML根节点名称只能是字母组成的字符串');
+        $this->value = $value;
+        $this->notes = $notes;
+    }
 
 
     /**
@@ -42,20 +56,6 @@ final class Xml
 
 
     /**
-     * Xml constructor.
-     * @param $value
-     * @param string $notes
-     */
-    public function __construct($value, string $notes = 'xml')
-    {
-        if (is_array($notes) and is_string($value)) list($value, $notes) = [$notes, $value];
-        if (!is_array($value)) throw new Error('XML数据要求为数组格式');
-        if (!preg_match('/^[a-z]+$/i', $notes)) throw new Error('XML根节点名称只能是字母组成的字符串');
-        $this->value = $value;
-        $this->notes = $notes;
-    }
-
-    /**
      * @param bool $output
      * @return XMLWriter
      */
@@ -80,7 +80,7 @@ final class Xml
         } else {
             $version = '1.0';
         }
-        $xml->startDocument($version, $encoding);
+        if (!is_null($version) and !is_null($encoding)) $xml->startDocument($version, $encoding);
         if (isset($this->value['_css'])) {
             $xml->writePi('xml-stylesheet', 'type="text/css" href="' . $this->value['_css'] . '"');
             unset($this->value['_css']);
