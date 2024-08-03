@@ -820,7 +820,7 @@ function screen_width(): int
  * ┗━━━┷━━━┛
  * * @param array $data
  */
-function _table(array $data)
+function _table(array $data): void
 {
     if (empty($data)) $data = [['EMPTY' => '$data is Empty']];
     /**
