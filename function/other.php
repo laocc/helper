@@ -24,6 +24,65 @@ function between_value($value, $min, $max)
     return $value;
 }
 
+/**
+ * mime 换算文件后缀
+ *
+ * @param string $type
+ * @return string
+ */
+function mime_ext(string $type): string
+{
+    $ext = [];
+    $ext['gif'] = 'image/gif';
+    $ext['jpeg'] = 'image/jpeg';
+    $ext['jpg'] = 'image/jpeg';
+    $ext['png'] = 'image/png';
+    $ext['tif'] = 'image/tiff';
+    $ext['tiff'] = 'image/tiff';
+
+    $ext['mp3'] = 'audio/mpeg';
+    $ext['mid'] = 'audio/midi';
+    $ext['ogg'] = 'audio/ogg';
+    $ext['m4a'] = 'audio/x-m4a';
+    $ext['ra'] = 'audio/x-realaudio';
+    $ext['apk'] = 'application/vnd.android.package-archive';
+
+    foreach ($ext as $et => $mie) {
+        if ($mie === $type) return $et;
+    }
+
+    $mime = [];
+    $mime['image/gif'] = 'gif';
+    $mime['image/jpeg'] = 'jpeg';
+    $mime['image/png'] = 'png';
+    $mime['image/tiff'] = 'tiff';
+
+    $mime['audio/mp3'] = 'mp3';
+    $mime['audio/mpeg'] = 'mp3';
+    $mime['audio/ogg'] = 'ogg';
+    $mime['audio/x-m4a'] = 'x-m4a';
+    $mime['audio/x-realaudio'] = 'ra';
+    $mime['audio/midi'] = 'midi';
+
+    $mime['video/3gpp'] = '3gpp';
+    $mime['video/mp2t'] = 'ts';
+    $mime['video/mp4'] = 'mp4';
+    $mime['video/quicktime'] = 'mov';
+    $mime['video/webm'] = 'webm';
+    $mime['video/x-flv'] = 'flv';
+    $mime['video/x-m4v'] = 'm4v';
+    $mime['video/x-mng'] = 'mng';
+    $mime['video/x-ms-asf'] = 'asx';
+    $mime['video/x-ms-wmv'] = 'wmv';
+    $mime['video/x-msvideo'] = 'avi';
+
+    foreach ($mime as $mie => $et) {
+        if ($mie === $type) return $et;
+    }
+
+    return 'png';
+}
+
 
 /**
  * @param string $ext
