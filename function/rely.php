@@ -42,7 +42,7 @@ function host(string $domain, int $right = null): string
 function domain(string $url): string
 {
     if (empty($url)) return '';
-    if (substr($url, 0, 4) !== 'http') return $url;
+    if (!str_starts_with($url, 'http')) return $url;
     return explode('/', "{$url}//")[2];
 }
 
@@ -51,7 +51,7 @@ function domain(string $url): string
  * 查询2个字串从开头起的相同部分
  * @param string $str1
  * @param string $str2
- * @return bool|string
+ * @return string
  */
 function same_first(string $str1, string $str2): string
 {
@@ -84,10 +84,10 @@ function load(string $file)
 function root(string $path, bool $real = false): string
 {
     foreach (['/home/', '/mnt/', '/mda/', '/mdb/', '/mdc/', '/mdd/', '/mde/', '/tmp/', '/www/'] as $r) {
-        if (strpos($path, $r) === 0) goto end;
+        if (str_starts_with($path, $r)) goto end;
     }
 
-    if (strpos($path, _ROOT) !== 0) $path = _ROOT . "/" . trim($path, '/');
+    if (!str_starts_with($path, _ROOT)) $path = _ROOT . "/" . trim($path, '/');
     end:
     if ($real) $path = realpath($path);
     if ($path === false) return '';
@@ -101,7 +101,7 @@ function root(string $path, bool $real = false): string
  */
 function in_root(string $path): bool
 {
-    return strpos($path, _ROOT) === 0;
+    return str_starts_with($path, _ROOT);
 }
 
 
@@ -116,16 +116,37 @@ function in_root(string $path): bool
 function save_file(string $file, $content, bool $append = false, array $trace = null): int
 {
 //    if (is_null($trace)) $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
-    if (is_array($content)) $content = json_encode($content, 256 | 64);
+    $previousHandler = set_error_handler(null);
+    set_error_handler(function ($errno, $errStr, $errFile, $errLine) {
+        throw new \RuntimeException($errStr, $errno);
+    });
     $tryOnce = true;
-    tryOnce:
-    mk_dir($file, 0740, $trace);
-    $save = @file_put_contents($file, $content, $append ? FILE_APPEND : LOCK_EX);
-    if ($save === false and $tryOnce) {
-        $tryOnce = false;
-        goto tryOnce;
+
+    try {
+        if (is_array($content)) $content = json_encode($content, 256 | 64);
+        tryOnce:
+        mk_dir($file, 0740, $trace);
+        $save = @file_put_contents($file, $content, $append ? FILE_APPEND : LOCK_EX);
+        if ($save === false and $tryOnce) {
+            $tryOnce = false;
+            goto tryOnce;
+        }
+        return $save;
+
+    } catch (\Throwable $exception) {
+        if ($tryOnce) {
+            $tryOnce = false;
+            goto tryOnce;
+        }
+
+    } finally {
+        restore_error_handler();
+        if ($previousHandler !== null) {
+            set_error_handler($previousHandler);
+        }
     }
-    return $save;
+
+    return 0;
 }
 
 /**
@@ -148,7 +169,7 @@ function locked(string $lockKey, callable $callable, ...$args)
     if (flock($fn, $operation)) {//加锁
         try {
             $rest = $callable(...$args);//执行
-        } catch (\Exception|\Error $error) {
+        } catch (\Throwable $error) {
             $rest = 'locked: ' . $error->getMessage();
         }
         flock($fn, LOCK_UN);//解锁
@@ -189,7 +210,7 @@ function mk_dir(string $path, int $mode = 0744, array $trace = null): bool
         try {
             if (!file_exists($path)) @mkdir($path, $mode ?: 0740, true);
             return true;
-        } catch (\Exception|\Error $error) {
+        } catch (\Throwable $error) {
             return false;
         }
     }, $path, $mode);
