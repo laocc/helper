@@ -565,7 +565,7 @@ function text(string $html, int $star = null, int $stop = null, bool $noSymbol =
         $symbol = '`‘-=[];,./~!@#$%^&*()_+{}|:"<>?·【】、；，。！￥…（）—：“《》？' . "'";
         $html = str_replace(str_cut($symbol), '', $html);
     }
-    $Symbol = ['  ', "﻿", "", "​", ' ', '', "　", "	", ' '];
+    $Symbol = [' ', "﻿", "", "​", ' ', '', "　", "	", ' '];
     $html = str_replace($Symbol, '', $html);
     return mb_substr(preg_replace($ptn, '', $html), $star, $stop, 'utf-8');
 }
@@ -575,12 +575,12 @@ function text(string $html, int $star = null, int $stop = null, bool $noSymbol =
  * 过滤所有可能的符号，并将连续的符号合并成1个
  * @param string $str
  * @param string $f
- * @return null|string|string[]
+ * @return string
  */
 function replace_for_split(string $str, string $f = ','): string
 {
     if (empty($str)) return '';
-    $Symbol = ['  ', "﻿", "", "​", ' ', '', "　", "	", ' '];
+    $Symbol = [' ', "﻿", "", "​", ' ', '', "　", "	", ' '];
     $str = mb_ereg_replace(
         implode($Symbol) . '\`\-\=\[\]\\\;\',\.\/\~\!\@\#\$\%\^\&\*\(\)\_\+\{\}\|\:\"\<\>\?\·【】、；‘，。/~！@#￥%……&*（）——+{}|：“《》？',
         $f, $str);
