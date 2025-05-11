@@ -108,12 +108,12 @@ function in_root(string $path): bool
 /**
  * 储存文件
  * @param string $file
- * @param  $content
+ * @param mixed $content
  * @param bool $append
  * @param array|null $trace
  * @return int
  */
-function save_file(string $file, $content, bool $append = false, array $trace = null): int
+function save_file(string $file, mixed $content, bool $append = false, array $trace = null): int
 {
 //    if (is_null($trace)) $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
     $previousHandler = set_error_handler(null);
