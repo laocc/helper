@@ -116,21 +116,16 @@ function date_diffs(int $timeA, int $timeB): string
         $time = abs($time);
         $fy = '-';
     }
-    if ($time < 86400) {
-        if ($time < 60) {
-            return "{$fy}{$time}秒";
-        } elseif ($time < 3600) {
-            return $fy . intval($time / 60) . '分' . ($time % 60) . '秒';
-        } else {
-            return $fy . intval($time / 3660) . '小时' . intval(($time % 3600) / 60) . '分';
-        }
-    } else if ($time > 2592000) {
-        return $fy . intval($time / 86400) . '天';
+    if ($time < 60) {
+        return "{$fy}{$time}秒";
+    } elseif ($time < 3600) {
+        return $fy . intval($time / 60) . '分' . ($time % 60) . '秒';
+    } elseif ($time < 86400) {
+        return $fy . intval($time / 3600) . '小时' . intval(($time % 3600) / 60) . '分';
     } else {
         return $fy . intval($time / 86400) . '天' . intval(($time % 86400) / 3600) . '小时';
     }
 }
-
 
 
 /**
