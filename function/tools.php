@@ -92,10 +92,11 @@ HTML;
  *
  * 配合Debug，将Transfer日志移到最终位置
  *
+ * @param string $path
  * @param bool $show
- * @param string|null $path
+ * @throws Error
  */
-function moveTransfer(string $path, bool $show = true)
+function moveTransfer(string $path, bool $show = true): void
 {
     if (!_CLI) throw new Error('moveTransfer只能运行于CLI环境');
     $time = 0;
@@ -239,7 +240,7 @@ function img_base64(string $file, bool $split = false): string
  */
 function base64_img(string $base64Code, string $fileName = null)
 {
-    if (substr($base64Code, 0, 4) === 'data') $base64Code = substr($base64Code, strpos($base64Code, 'base64,') + 7);
+    if (str_starts_with($base64Code, 'data')) $base64Code = substr($base64Code, strpos($base64Code, 'base64,') + 7);
     $data = base64_decode($base64Code);
     if (!$data) return false;
     $im = @imagecreatefromstring($data);
@@ -408,6 +409,12 @@ function rnd(float $amount, int $len = 2, bool $zero = true): string
     return sprintf("%.{$len}f", $amount);
 }
 
+function esp_dump($var)
+{
+    ob_start();
+    var_dump($var);
+    return ob_get_clean();
+}
 
 /**
  * 根据权重随机选择一个值
