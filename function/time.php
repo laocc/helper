@@ -89,27 +89,33 @@ function diff_day(int $a, int $b): int
  * 相差天数，a>b时为负数
  * @param int $a
  * @param int $b
+ * @param bool $f
  * @return string
  */
-function diff_time(int $a, int $b): string
+function diff_time(int $a, int $b, bool $f = true): string
 {
+    $un = ['天', '小时', '分', '秒'];
+    if ($f) $un = ['D', '°', '‘', '″'];
     $interval = date_diff(date_create(date('YmdHis', $a)), date_create(date('YmdHis', $b)));
     $d = $interval->format('%a') * 1;
     $h = $interval->format('%h') * 1;
     $i = $interval->format('%i') * 1;
     $s = $interval->format('%s') * 1;
-    $d = $d > 0 ? "{$d}天" : '';
-    $h = $h > 0 ? "{$h}小时" : '';
-    $i = $i > 0 ? "{$i}分" : '';
-    $s = $s > 0 ? "{$s}秒" : '';
+    $d = $d > 0 ? "{$d}{$un[0]}" : '';
+    $h = $h > 0 ? "{$h}{$un[1]}" : '';
+    $i = $i > 0 ? "{$i}{$un[2]}" : '';
+    $s = $s > 0 ? "{$s}{$un[3]}" : '';
     if ($d) return "{$d}{$h}";//1天以上
     if ($h) return "{$h}{$i}";//1小时以上
     if ($i) return "{$i}{$s}";//1分钟以上
     return $s;
 }
 
-function date_diffs(int $timeA, int $timeB): string
+function date_diffs(int $timeA, int $timeB, bool $f = true): string
 {
+    $un = ['天', '小时', '分', '秒'];
+    if ($f) $un = ['D', '°', '‘', '″'];
+
     $fy = '';
     $time = $timeA - $timeB;
     if ($time < 0) {
@@ -117,13 +123,13 @@ function date_diffs(int $timeA, int $timeB): string
         $fy = '-';
     }
     if ($time < 60) {
-        return "{$fy}{$time}秒";
+        return "{$fy}{$time}{$un[3]}";
     } elseif ($time < 3600) {
-        return $fy . intval($time / 60) . '分' . ($time % 60) . '秒';
+        return $fy . intval($time / 60) . $un[2] . ($time % 60) . $un[3];
     } elseif ($time < 86400) {
-        return $fy . intval($time / 3600) . '小时' . intval(($time % 3600) / 60) . '分';
+        return $fy . intval($time / 3600) . $un[1] . intval(($time % 3600) / 60) . $un[2];
     } else {
-        return $fy . intval($time / 86400) . '天' . intval(($time % 86400) / 3600) . '小时';
+        return $fy . intval($time / 86400) . $un[0] . intval(($time % 86400) / 3600) . $un[1];
     }
 }
 
