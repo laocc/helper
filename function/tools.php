@@ -829,6 +829,11 @@ function screen_width(): int
  */
 function _table(array $data): void
 {
+    formattedTable($data);
+}
+
+function _tableOLD(array $data): void
+{
     if (empty($data)) $data = [['EMPTY' => '$data is Empty']];
     /**
      * 字串实际显示占位，utf8是3位，实际显示出来到终端gbk是2位
@@ -840,9 +845,14 @@ function _table(array $data): void
     };
 
     $width = [];
-    $title = array_keys($data[0]);
+    $title = null;
     foreach ($data as $rs) {
-        $title = array_unique(array_merge($title, array_keys($rs)));
+        if (is_string($rs)) continue;
+        if (is_null($title)) {
+            $title = array_keys($rs);
+        } else {
+            $title = array_unique(array_merge($title, array_keys($rs)));
+        }
         foreach ($rs as $w => $v) {
             $width[$w] = max($width[$w] ?? 0, $wLen(strval($w)), $wLen(strval($v)));
         }
@@ -872,16 +882,26 @@ function _table(array $data): void
         if ($index === $len) echo "\n";
     }
 
-    $index = 0;
-    foreach ($width as $w => $l) {
-        $index++;
-        if ($index === 1) echo "┣";
-        echo str_repeat("━", $l);
-        if ($index === $len) echo "┫\n";
-        else echo "╋";
+    function echoLine(array $width, int $len)
+    {
+        $index = 0;
+        foreach ($width as $w => $l) {
+            $index++;
+            if ($index === 1) echo "┣";
+            echo str_repeat("━", $l);
+            if ($index === $len) echo "┫\n";
+            else echo "╋";
+        }
     }
 
+    echoLine($width, $len);
+
     foreach ($data as $rs) {
+        if ($rs === 'line') {
+            echoLine($width, $len);
+            continue;
+        }
+
         $index = 0;
         foreach ($rs as $r => $v) {
             $index++;
@@ -902,6 +922,120 @@ function _table(array $data): void
         if ($index === $len) echo "┛\n";
         else echo "┻";
     }
+}
+
+function formattedTable(array $data): void
+{
+    if (empty($data)) {
+        $data = [['提示' => '数据为空']];
+    }
+
+    /**
+     * 计算字符串在终端的显示宽度（适配中英文混合）
+     * UTF-8中文字符占3字节，显示为2个字符宽度；英文字符占1字节，显示为1个字符宽度
+     */
+    $calcDisplayWidth = function (string $str): float {
+        $charCount = mb_strlen($str);       // 字符数（中英文均计为1）
+        $byteCount = strlen($str);          // 字节数（中文3，英文1）
+        return $charCount + ($byteCount - $charCount) / 2;
+    };
+
+    // 收集所有表头列（去重并保持顺序）
+    $columns = [];
+    foreach ($data as $row) {
+        if (is_string($row)) {
+            continue; // 跳过分隔线标记或字符串行
+        }
+        foreach (array_keys($row) as $col) {
+            if (!in_array($col, $columns, true)) {
+                $columns[] = $col;
+            }
+        }
+    }
+
+    // 计算每列的宽度（取列名和列值的最大宽度）
+    $columnWidths = [];
+    foreach ($columns as $col) {
+        // 至少保证列名的宽度
+        $width = $calcDisplayWidth((string)$col);
+
+        // 遍历所有行计算列值的最大宽度
+        foreach ($data as $row) {
+            if (is_string($row) || !isset($row[$col])) {
+                continue;
+            }
+            $valueWidth = $calcDisplayWidth((string)$row[$col]);
+            $width = max($width, $valueWidth);
+        }
+
+        // 转为整数（终端宽度只能是整数）
+        $columnWidths[$col] = (int)ceil($width);
+    }
+
+    // 绘制分隔线（顶部、中间、底部）
+    $drawSeparator = function (string $start, string $middle, string $end, string $line)
+    use ($columns, $columnWidths) {
+        $output = $start;
+        $totalColumns = count($columns);
+        foreach ($columns as $index => $col) {
+            $output .= str_repeat($line, $columnWidths[$col]);
+            // 最后一列用结束符，其他用分隔符
+            $output .= ($index === $totalColumns - 1) ? $end : $middle;
+        }
+        echo $output . "\n";
+    };
+
+    // 绘制顶部边框
+    $drawSeparator('┏', '┳', '┓', '━');
+
+    // 绘制表头
+    $output = '┃';
+    foreach ($columns as $col) {
+        $value = (string)$col;
+        $width = $columnWidths[$col];
+        $padding = $width - $calcDisplayWidth($value);
+        $output .= $value . str_repeat(' ', (int)ceil($padding));
+        $output .= '┃';
+    }
+    echo $output . "\n";
+
+    // 绘制表头与内容的分隔线
+    $drawSeparator('┣', '╋', '┫', '━');
+
+    // 绘制数据行
+    foreach ($data as $row) {
+        // 处理分隔线标记
+        if ($row === 'line') {
+            $drawSeparator('┣', '╋', '┫', '━');
+            continue;
+        }
+
+        // 处理字符串行（非分隔线）
+        if (is_string($row)) {
+            $output = '┃';
+            $totalWidth = array_sum($columnWidths) + (count($columns) - 1); // 总宽度+分隔符占位
+            $padding = $totalWidth - $calcDisplayWidth($row);
+            $output .= $row . str_repeat(' ', (int)ceil($padding));
+            $output .= '┃';
+            echo $output . "\n";
+            continue;
+        }
+
+        // 绘制正常数据行（确保每列都有内容，缺失则为空）
+        $output = '┃';
+        foreach ($columns as $col) {
+            $value = $row[$col] ?? ''; // 缺失的列显示为空
+            $valueStr = (string)$value;
+            $width = $columnWidths[$col];
+            $padding = $width - $calcDisplayWidth($valueStr);
+            $output .= $valueStr . str_repeat(' ', (int)ceil($padding));
+            $output .= '┃';
+        }
+        echo $output . "\n";
+    }
+
+    // 绘制底部边框
+    $drawSeparator('┗', '┻', '┛', '━');
 }
 
 
