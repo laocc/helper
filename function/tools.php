@@ -729,7 +729,7 @@ function disk_size(array $disk)
     while (!feof($fp)) {
         $item = fgets($fp, 4096);
         foreach ($disk as $d => $p) {
-            if (strpos($item, $p) === 0) {
+            if (str_starts_with($item, $p)) {
                 preg_match('/([\d\.]+[GM])\s+([\d\.]+[GM])\s+([\d\.]+[GM])\s+([\d\.]+)\%/', $item, $size);
                 $size[4] = intval($size[4]);
                 $value[$d] = $size;
@@ -1011,8 +1011,8 @@ function formattedTable(array $data): void
         }
 
         // 处理字符串行（非分隔线）
+        $output = '┃';
         if (is_string($row)) {
-            $output = '┃';
             $totalWidth = array_sum($columnWidths) + (count($columns) - 1); // 总宽度+分隔符占位
             $padding = $totalWidth - $calcDisplayWidth($row);
             $output .= $row . str_repeat(' ', (int)ceil($padding));
@@ -1022,7 +1022,6 @@ function formattedTable(array $data): void
         }
 
         // 绘制正常数据行（确保每列都有内容，缺失则为空）
-        $output = '┃';
         foreach ($columns as $col) {
             $value = $row[$col] ?? ''; // 缺失的列显示为空
             $valueStr = (string)$value;
