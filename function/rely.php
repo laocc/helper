@@ -161,11 +161,22 @@ function save_file(string $file, mixed $content, bool $append = false, array $tr
  */
 function locked(string $lockKey, callable $callable, ...$args)
 {
+    if (empty($lockKey)) $lockKey = 'locked';
+    $lockKey = str_replace(['/', '\\', '*', '"', "'", '<', '>', ':', ';', '?'], '', $lockKey);
     $option = intval($lockKey[0]);
     $operation = ($option & 1) ? (LOCK_EX | LOCK_NB) : LOCK_EX;
-    $lockKey = str_replace(['/', '\\', '*', '"', "'", '<', '>', ':', ';', '?'], '', $lockKey);
     if (_CLI) $lockKey = $lockKey . '_CLI_';
     $fn = fopen(($lockFile = "/tmp/{$lockKey}.flock"), 'a');
+
+    if ($fn === false) {
+        return "取得锁文件{$lockFile}失败";
+    }
+
+    /**
+     * LOCK_SH取得共享锁定（读取的程序）。
+     * LOCK_EX 取得独占锁定（写入的程序。
+     * LOCK_UN 释放锁定（无论共享或独占）。
+     */
     if (flock($fn, $operation)) {//加锁
         try {
             $rest = $callable(...$args);//执行
@@ -179,6 +190,40 @@ function locked(string $lockKey, callable $callable, ...$args)
     fclose($fn);
     if (!($option & 2) and is_readable($lockFile)) @unlink($lockFile);
     return $rest;
+}
+
+function mk_dir(string $path, int $mode = 0744): bool
+{
+    if (!$path) return false;
+    if (is_dir($path)) return true;
+
+    $check = strrchr($path, '/');
+    if ($check === false) {
+        throw new Error("目录或文件名中必须含有/号，当前path=" . var_export($path, true));
+    } elseif ($check !== '/') {
+        $path = dirname($path);
+    }
+
+    $lockKey = 'mkdir_' . md5($path);
+
+    $run = locked($lockKey, function ($path, $mode) {
+        if (is_dir($path)) return true;
+
+        $oldUmask = umask(0); // 临时清除umask影响
+        $success = mkdir($path, $mode, true);
+        umask($oldUmask); // 恢复umask
+
+        if (!$success) {
+            $error = error_get_last();
+            trigger_error("创建目录失败: {$error['message']}", E_USER_WARNING);
+            return false;
+        }
+        return true;
+    }, $path, $mode);
+
+    if (is_string($run)) return false;
+
+    return true;
 }
 
 /**
@@ -196,7 +241,7 @@ function locked(string $lockKey, callable $callable, ...$args)
  * @param array|null $trace
  * @return bool
  */
-function mk_dir(string $path, int $mode = 0744, array $trace = null): bool
+function mk_dir2(string $path, int $mode = 0744, array $trace = null): bool
 {
     if (!$path) return false;
     if (file_exists($path)) return true;
@@ -206,7 +251,7 @@ function mk_dir(string $path, int $mode = 0744, array $trace = null): bool
         throw new Error("目录或文件名中必须要含有/号，当前path=" . var_export($path, true));
     } else if ($check !== '/') $path = dirname($path);
 
-    return locked('2mkdir', function ($path, $mode) {
+    $create = locked('2mkdir', function ($path, $mode) {
         try {
             if (!file_exists($path)) @mkdir($path, $mode ?: 0740, true);
             return true;
@@ -214,6 +259,9 @@ function mk_dir(string $path, int $mode = 0744, array $trace = null): bool
             return false;
         }
     }, $path, $mode);
+
+    if (is_string($create)) return false;
+    return true;
 }
 
 
