@@ -80,7 +80,7 @@ abstract class Request
         $token = $param['token'] ?? '';
         $data = $param['sign_data'] ?? $this->_data;
 
-        if (substr($sKey, 0, 5) === 'HTTP_') {
+        if (str_starts_with($sKey, 'HTTP_')) {
             $sign = getenv($sKey);
 
         } else if (isset($param[$sKey])) {
