@@ -188,7 +188,7 @@ function locked(string $lockKey, callable $callable, ...$args)
         $rest = "locked: Running";
     }
     fclose($fn);
-    if (!($option & 2) and is_readable($lockFile)) @unlink($lockFile);
+    if (!($option & 2) and is_file($lockFile)) @unlink($lockFile);
     return $rest;
 }
 
