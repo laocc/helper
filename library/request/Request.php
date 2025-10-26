@@ -43,10 +43,13 @@ abstract class Request
             $max = 4611686018427387904;
         }
 
-        if ($min > 0 && $min > $number) {
+        if ($min >= 0 && $min > $number) {
+            if ($type === 1) return "日期不能小于1970年";
             return "不能小于最小值({$min})，当前={$number}";
         }
+
         if ($max > 0 && $max < $number) {
+            if ($type === 1) return "日期不能大于2100年";
             return "不能大于最大值({$max})，当前={$number}";
         }
 
