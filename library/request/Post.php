@@ -234,6 +234,20 @@ final class Post extends Request
         return $value;
     }
 
+    public function bigint(string $key, bool $zero = true): int
+    {
+        $value = $this->getData($key, $force);
+        if (is_null($value)) return 0;
+        if (is_string($value) and preg_match('/^\[.+\]$/', $value)) $value = json_decode($value, true);
+        if (is_array($value)) $value = array_sum($value);
+
+        if ($value === '' && $force) $this->recodeError($key);
+        $value = intval($value);
+        if ($value === 0 && !$zero) $this->recodeError($key, '不能为零或空值');
+        if ($chk = $this->errorNumber($value, 8)) $this->recodeError($key, $chk);
+        return $value;
+    }
+
     public function tinyint(string $key, bool $zero = true): int
     {
         $value = $this->int($key, $zero);

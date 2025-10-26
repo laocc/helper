@@ -39,6 +39,8 @@ abstract class Request
         } else if ($type === 2) {//2位小数的金额
 //            $min = intval(floatval($min) * 100);
 //            $max = intval(floatval($max) * 100);
+        } else if ($type === 8) {
+            $max = 4611686018427387904;
         }
 
         if ($min > 0 && $min > $number) {
