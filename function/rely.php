@@ -264,6 +264,35 @@ function mk_dir2(string $path, int $mode = 0744, array $trace = null): bool
     return true;
 }
 
+/**
+ * 遍历删除目录
+ *
+ * @param string $path
+ * @param bool $show
+ * @return bool
+ */
+function rm_dir(string $path, bool $show = false): bool
+{
+    if (!_CLI) return -1;
+    if (!is_dir($path)) return 0;
+    $count = 0;
+    $iterator = new \RecursiveIteratorIterator(
+        new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS),
+        \RecursiveIteratorIterator::CHILD_FIRST);
+
+    foreach ($iterator as $file) {
+        $name = $file->getPathname();
+        if ($file->isDir()) @rmdir($name);
+        else @unlink($name);
+        if ($show) echo "{$name}\n";
+        $count++;
+    }
+
+    @rmdir($path);
+    $count++;
+    return $count;
+}
+
 
 /**
  * XML解析成数组或对象

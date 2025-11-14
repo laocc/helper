@@ -187,10 +187,12 @@ function is_time(string $value): bool
 function is_json(string $value): bool
 {
     if (empty($value)) return false;
-    if (!preg_match('/^(\{.*\})|(\[.*\])$/', $value)) return false;
+    if (version_compare(PHP_VERSION, '8.3.0', '>=')) {
+        return json_validate($value);
+    }
     try {
         $a = json_decode($value, true);
-        if (!is_array($a)) return false;
+        if (!is_array($a) or (json_last_error() !== JSON_ERROR_NONE)) return false;
     } catch (\Error|\Exception $exception) {
         return false;
     }
