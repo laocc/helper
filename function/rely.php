@@ -192,7 +192,7 @@ function locked(string $lockKey, callable $callable, ...$args)
     return $rest;
 }
 
-function mk_dir(string $path, int $mode = 0744): bool
+function mk_dir(string $path, int $mode = 1): bool
 {
     if (!$path) return false;
     if (is_dir($path)) return true;
@@ -204,7 +204,12 @@ function mk_dir(string $path, int $mode = 0744): bool
         $path = dirname($path);
     }
 
-    $lockKey = 'mkdir_' . md5($path);
+    if ($mode & 1) {
+        $lockKey = 'mkdir_' . uniqid();
+        $mode = 0744;
+    } else {
+        $lockKey = 'mkdir_' . md5($path);
+    }
 
     $run = locked($lockKey, function ($path, $mode) {
         if (is_dir($path)) return true;
