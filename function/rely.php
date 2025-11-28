@@ -159,7 +159,7 @@ function save_file(string $file, mixed $content, bool $append = false, array $tr
  * @param mixed ...$args
  * @return mixed
  */
-function locked(string $lockKey, callable $callable, ...$args)
+function locked(string $lockKey, callable $callable, ...$args): mixed
 {
     if (empty($lockKey)) $lockKey = 'locked';
     $lockKey = str_replace(['/', '\\', '*', '"', "'", '<', '>', ':', ';', '?'], '', $lockKey);
@@ -309,7 +309,7 @@ function rm_dir(string $path, bool $show = false): bool
  * @param bool $toArray
  * @return mixed|null
  */
-function xml_decode(string $str, bool $toArray = true)
+function xml_decode(string $str, bool $toArray = true): mixed
 {
     if (!$str) return null;
     $xml_parser = xml_parser_create();
