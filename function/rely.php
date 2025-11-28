@@ -173,7 +173,7 @@ function locked(string $lockKey, callable $callable, ...$args)
     }
 
     /**
-     * LOCK_SH取得共享锁定（读取的程序）。
+     * LOCK_SH 取得共享锁定（读取的程序）。
      * LOCK_EX 取得独占锁定（写入的程序。
      * LOCK_UN 释放锁定（无论共享或独占）。
      */
@@ -220,7 +220,11 @@ function mk_dir(string $path, int $mode = 1): bool
 
         if (!$success) {
             $error = error_get_last();
-            trigger_error("创建目录失败: {$error['message']}", E_USER_WARNING);
+            if (is_array($error)) {
+                trigger_error("创建目录{$path}失败: {$error['message']}", E_USER_WARNING);
+            } else {
+                trigger_error("创建目录{$path}失败:" . json_encode(['error' => $error, 'success' => $success], 320), E_USER_WARNING);
+            }
             return false;
         }
         return true;
