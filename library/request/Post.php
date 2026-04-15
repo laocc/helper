@@ -18,9 +18,63 @@ use function esp\helper\is_url;
 use function esp\helper\xml_encode;
 use function esp\helper\xml_decode;
 
-final class Post extends Request
+class Post extends Request
 {
 
+
+    public function __construct(string $type = null)
+    {
+        $this->_isPost = true;
+        if ($type === 'post' or (strpos(getenv('HTTP_CONTENT_TYPE') ?: '', 'boundary') > 0)) {
+            $this->_data = $_POST;
+            return;
+        }
+
+        $this->_raw = file_get_contents('php://input');
+        if (empty($this->_raw)) return;
+
+        if ($type === 'auto' or is_null($type)) {
+            if (preg_match('/^\{.+\}$/is', $this->_raw)) {
+                $type = 'json';
+            } else if (preg_match('/^\<.+\>$/is', $this->_raw)) {
+                $type = 'xml';
+            } else {
+                $type = 'string';
+            }
+        }
+
+        $data = [];
+        switch ($type) {
+            case 'json':
+                $data = json_decode($this->_raw, true);
+                break;
+
+            case 'xml':
+                $data = xml_decode($this->_raw, true);
+                break;
+
+            case 'php':
+                $data = unserialize($this->_raw);
+                break;
+
+            case 'unknown':
+                //不确定格式
+                if (($this->_raw[0] === '{' and $this->_raw[-1] === '}')
+                    or ($this->_raw[0] === '[' and $this->_raw[-1] === ']')) {
+                    $data = json_decode($this->_raw, true);
+
+                } else if ($this->_raw[0] === '<' and $this->_raw[-1] === '>') {
+                    $data = xml_decode($this->_raw, true);
+
+                }
+                break;
+
+            default:
+                parse_str($this->_raw, $data);
+        }
+
+        if (is_array($data)) $this->_data = $data;
+    }
 
     /**
      * @param string $key
@@ -52,51 +106,6 @@ final class Post extends Request
         if ($chk = $this->errorString($value, $xssLevel)) $this->recodeError($key, $chk);
 
         return $value;
-    }
-
-    private function checkString(string $type, $value)
-    {
-        if (is_array($value)) return false;
-
-        switch ($type) {
-            case 'mobile':
-                return is_mob($value);
-            case 'phone':
-                return is_phone($value);
-            case 'card':
-                return is_card($value);
-            case 'url':
-                return is_url($value) || is_domain($value);
-            case 'mail':
-            case 'email':
-                return is_mail($value);
-            case 'ip':
-            case 'ip4':
-                return is_ip($value, 'ipv4');
-            case 'ip6':
-                return is_ip($value, 'ipv6');
-            case 'date':
-                return is_date($value);
-            case 'time':
-                return is_time($value);
-            case 'domain':
-                return is_domain($value);
-            case 'datetime':
-                return strtotime($value);
-            case 'cn':
-                return preg_match('/^[\x{4e00}-\x{9fa5}]+$/u', strval($value));
-            case 'en':
-                return preg_match('/^[a-zA-Z]+$/', strval($value));
-            case 'number':
-                return preg_match('/^\d+$/', strval($value));
-            case 'decimal':
-                return preg_match('/^\d+(\.\d+)?$/', strval($value));
-            case 'alphanumeric'://字母和数字
-                return preg_match('/^[a-z\d]+$/i', strval($value));
-            default:
-                if (is_match($type)) return preg_match($type, strval($value));
-        }
-        return false;
     }
 
     /**
@@ -375,7 +384,9 @@ final class Post extends Request
                 $value = parse_ini_string($value, true);
 
             } else {
-                parse_str($value, $value);
+                $arr = [];
+                parse_str($value, $arr);
+                $value = &$arr;
             }
         }
 
@@ -409,58 +420,49 @@ final class Post extends Request
         return $this->_error;
     }
 
-    public function __construct(string $type = null)
+    private function checkString(string $type, $value)
     {
-        $this->_isPost = true;
-        if ($type === 'post' or (strpos(getenv('HTTP_CONTENT_TYPE') ?: '', 'boundary') > 0)) {
-            $this->_data = $_POST;
-            return;
-        }
+        if (is_array($value)) return false;
 
-        $this->_raw = file_get_contents('php://input');
-        if (empty($this->_raw)) return;
-
-        if ($type === 'auto' or is_null($type)) {
-            if (preg_match('/^\{.+\}$/is', $this->_raw)) {
-                $type = 'json';
-            } else if (preg_match('/^\<.+\>$/is', $this->_raw)) {
-                $type = 'xml';
-            } else {
-                $type = 'string';
-            }
-        }
-
-        $data = [];
         switch ($type) {
-            case 'json':
-                $data = json_decode($this->_raw, true);
-                break;
-
-            case 'xml':
-                $data = xml_decode($this->_raw, true);
-                break;
-
-            case 'php':
-                $data = unserialize($this->_raw);
-                break;
-
-            case 'unknown':
-                //不确定格式
-                if (($this->_raw[0] === '{' and $this->_raw[-1] === '}')
-                    or ($this->_raw[0] === '[' and $this->_raw[-1] === ']')) {
-                    $data = json_decode($this->_raw, true);
-
-                } else if ($this->_raw[0] === '<' and $this->_raw[-1] === '>') {
-                    $data = xml_decode($this->_raw, true);
-
-                }
-                break;
-
+            case 'mobile':
+                return is_mob($value);
+            case 'phone':
+                return is_phone($value);
+            case 'card':
+                return is_card($value);
+            case 'url':
+                return is_url($value) || is_domain($value);
+            case 'mail':
+            case 'email':
+                return is_mail($value);
+            case 'ip':
+            case 'ip4':
+                return is_ip($value, 'ipv4');
+            case 'ip6':
+                return is_ip($value, 'ipv6');
+            case 'date':
+                return is_date($value);
+            case 'time':
+                return is_time($value);
+            case 'domain':
+                return is_domain($value);
+            case 'datetime':
+                return strtotime($value);
+            case 'cn':
+                return preg_match('/^[\x{4e00}-\x{9fa5}]+$/u', strval($value));
+            case 'en':
+                return preg_match('/^[a-zA-Z]+$/', strval($value));
+            case 'number':
+                return preg_match('/^\d+$/', strval($value));
+            case 'decimal':
+                return preg_match('/^\d+(\.\d+)?$/', strval($value));
+            case 'alphanumeric'://字母和数字
+                return preg_match('/^[a-z\d]+$/i', strval($value));
             default:
-                parse_str($this->_raw, $data);
+                if (is_match($type)) return preg_match($type, strval($value));
         }
-
-        if (is_array($data)) $this->_data = $data;
+        return false;
     }
 
 
