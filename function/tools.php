@@ -372,7 +372,7 @@ function make_card_suffix(string $zone, string $day = null, string $number = nul
 /**
  * 设置HTTP响应头
  * @param int $code
- * @param string|null $text
+ * @param string $text
  */
 function header_state(int $code = 200, string $text = '')
 {
@@ -409,7 +409,19 @@ function rnd(float $amount, int $len = 2, bool $zero = true): string
     return sprintf("%.{$len}f", $amount);
 }
 
-function esp_dump($var)
+/**
+ * 金额元转换为分
+ * @param float|string|int $amount
+ * @param int $ch
+ * @param int $scale
+ * @return int
+ */
+function money(float|string|int $amount, int $ch = 100, int $scale = 0): int
+{
+    return (int)bcmul("{$amount}", "{$ch}", $scale);
+}
+
+function esp_dump($var): false|string
 {
     ob_start();
     var_dump($var);

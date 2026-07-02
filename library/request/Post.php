@@ -17,6 +17,7 @@ use function esp\helper\is_match;
 use function esp\helper\is_url;
 use function esp\helper\xml_encode;
 use function esp\helper\xml_decode;
+use function esp\helper\money;
 
 class Post extends Request
 {
@@ -296,7 +297,7 @@ class Post extends Request
         $value = $this->getData($key, $force);
         if (is_null($value)) return 0;
         if ($value === '' && $force) $this->recodeError($key);
-        $value = intval(strval(floatval($value) * 100));
+        $value = money($value);
         if ($chk = $this->errorNumber($value, 2)) $this->recodeError($key, $chk);
         return $value;
     }

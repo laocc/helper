@@ -14,6 +14,7 @@ use function esp\helper\is_time;
 use function esp\helper\is_url;
 use function esp\helper\is_match;
 use function esp\helper\xml_decode;
+use function esp\helper\money;
 
 class Get extends Request
 {
@@ -178,7 +179,7 @@ class Get extends Request
     {
         $value = $this->getData($key, $force);
         if (is_null($value)) return 0;
-        return intval(strval(floatval($value) * 100));
+        return money($value);
     }
 
     public function match(string $key, string $pnt): string
