@@ -10,7 +10,6 @@
   ],
   "require": {
     "php": ">8.0.0",
-    "laocc/fonts": "*",
     "ext-json": "*",
     "ext-xmlwriter": "*",
     "ext-bcmath": "*"
