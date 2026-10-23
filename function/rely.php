@@ -11,7 +11,7 @@ use esp\helper\library\ext\Xml;
  * @param int|null $right
  * @return string
  */
-function host(string $domain, int $right = null): string
+function host(string $domain, ?int $right = null): string
 {
     if (empty($domain)) return '';
     if (strpos($domain, '/')) $domain = explode('/', "{$domain}//")[2];
@@ -113,7 +113,7 @@ function in_root(string $path): bool
  * @param array|null $trace
  * @return int
  */
-function save_file(string $file, mixed $content, bool $append = false, array $trace = null): int
+function save_file(string $file, mixed $content, bool $append = false, ?array $trace = null): int
 {
 //    if (is_null($trace)) $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
     $previousHandler = set_error_handler(null);
@@ -250,7 +250,7 @@ function mk_dir(string $path, int $mode = 1): bool
  * @param array|null $trace
  * @return bool
  */
-function mk_dir2(string $path, int $mode = 0744, array $trace = null): bool
+function mk_dir2(string $path, int $mode = 0744, ?array $trace = null): bool
 {
     if (!$path) return false;
     if (file_exists($path)) return true;

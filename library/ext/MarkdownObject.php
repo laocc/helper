@@ -40,7 +40,7 @@ class MarkdownObject
      * @param bool $addBoth
      * @return string
      */
-    public function render(string $text, bool $addNav = null, bool $addBoth = true)
+    public function render(string $text, ?bool $addNav = null, bool $addBoth = true)
     {
         $this->_footnotes = array();
         $this->_definitions = array();

@@ -23,7 +23,7 @@ class Post extends Request
 {
 
 
-    public function __construct(string $type = null)
+    public function __construct(?string $type = null)
     {
         $this->_isPost = true;
         if ($type === 'post' or (strpos(getenv('HTTP_CONTENT_TYPE') ?: '', 'boundary') > 0)) {

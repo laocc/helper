@@ -451,7 +451,7 @@ class Password
      * @param string|null $priKey
      * @return string
      */
-    public static function ssl_decode(string $data, string $priKey = null): string
+    public static function ssl_decode(string $data, ?string $priKey = null): string
     {
         $ret = '';
         $data = base64_decode($data);

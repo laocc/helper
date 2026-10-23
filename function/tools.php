@@ -238,7 +238,7 @@ function img_base64(string $file, bool $split = false): string
  * @return bool
  * @throws Error
  */
-function base64_img(string $base64Code, string $fileName = null)
+function base64_img(string $base64Code, ?string $fileName = null)
 {
     if (str_starts_with($base64Code, 'data')) $base64Code = substr($base64Code, strpos($base64Code, 'base64,') + 7);
     $data = base64_decode($base64Code);
@@ -330,7 +330,7 @@ function id_card_info(string $idCode)
  * @param string|null $number
  * @return string
  */
-function make_card(string $zone, string $day = null, string $number = null): string
+function make_card(string $zone, ?string $day = null, ?string $number = null): string
 {
     $suffix = make_card_suffix($zone, $day, $number);
     if (strlen($suffix) > 1) return $suffix;
@@ -346,7 +346,7 @@ function make_card(string $zone, string $day = null, string $number = null): str
  * @param string|null $number 后三位号码
  * @return string
  */
-function make_card_suffix(string $zone, string $day = null, string $number = null): string
+function make_card_suffix(string $zone, ?string $day = null, ?string $number = null): string
 {
     if (is_null($day)) {
         if (!preg_match('/^(\d{6})(\d{8})(\d{3})/', $zone, $mat)) return '身份证号前17位格式不正确';
@@ -574,7 +574,7 @@ function safe_replace(string $str): string
  * @param bool $noSymbol
  * @return string
  */
-function text(string $html, int $star = null, int $stop = null, bool $noSymbol = false): string
+function text(string $html, ?int $star = null, ?int $stop = null, bool $noSymbol = false): string
 {
     if ($stop === null) list($star, $stop) = [0, $star];
     $html = trim($html);
@@ -759,7 +759,7 @@ function disk_size(array $disk)
  * @param string|null $bgColor
  * @param string|null $ftColor
  */
-function _echo($text, string $bgColor = null, string $ftColor = null)
+function _echo($text, ?string $bgColor = null, ?string $ftColor = null)
 {
     if (!_CLI) return;
     if (is_array($text)) $text = print_r($text, true);

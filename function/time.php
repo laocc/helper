@@ -140,7 +140,7 @@ function date_diffs(int $timeA, int $timeB, bool $f = true): string
  * @param int|null $time_now
  * @return string
  */
-function date_friendly(int $timestamp, int $time_now = null): string
+function date_friendly(int $timestamp, ?int $time_now = null): string
 {
     $time = time();
     $Q = $timestamp > $time ? '后' : '前';
