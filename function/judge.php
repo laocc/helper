@@ -11,7 +11,7 @@ namespace esp\helper;
 function is_mob(string $value): bool
 {
     if (empty($value)) return false;
-    return (boolean)preg_match('/^1[3456789]\d{9}$/', $value);
+    return (bool)preg_match('/^1[3456789]\d{9}$/', $value);
 }
 
 /**
@@ -23,12 +23,12 @@ function is_mob(string $value): bool
 function is_phone(string $value, int $mode = 63): bool
 {
     if (empty($value)) return false;
-    return (($mode & 1) && (boolean)preg_match('/^1[3456789]\d{9}$/', $value)) or //手机号格式
-        (($mode & 2) && (boolean)preg_match('/^1[3456789]\d{9}[\_\-\+]\d{3,4}$/', $value)) or //手机号-分机号
-        (($mode & 4) && (boolean)preg_match('/^0\d{2,3}(-|\x20)?\d{7,8}$/', $value)) or //010-12388855
-        (($mode & 8) && (boolean)preg_match('/^0\d{2,3}(-|\x20)?\d{7,8}(-|\x20)\d{1,5}$/', $value)) or //区号+号码+分号
-        (($mode & 16) && (boolean)preg_match('/^0\d{10,11}$/', $value)) or //01025456365
-        (($mode & 32) && (boolean)preg_match('/^400(-|\x20)?\d{7,8}$/', $value)); //400电话
+    return (($mode & 1) && (bool)preg_match('/^1[3456789]\d{9}$/', $value)) or //手机号格式
+        (($mode & 2) && (bool)preg_match('/^1[3456789]\d{9}[\_\-\+]\d{3,4}$/', $value)) or //手机号-分机号
+        (($mode & 4) && (bool)preg_match('/^0\d{2,3}(-|\x20)?\d{7,8}$/', $value)) or //010-12388855
+        (($mode & 8) && (bool)preg_match('/^0\d{2,3}(-|\x20)?\d{7,8}(-|\x20)\d{1,5}$/', $value)) or //区号+号码+分号
+        (($mode & 16) && (bool)preg_match('/^0\d{10,11}$/', $value)) or //01025456365
+        (($mode & 32) && (bool)preg_match('/^400(-|\x20)?\d{7,8}$/', $value)); //400电话
 }
 
 /**
@@ -40,7 +40,7 @@ function is_username(string $value, bool $canEmpty = false): bool
 {
     if ($canEmpty and empty($value)) return true;
     if (empty($value)) return false;
-    return (boolean)preg_match('/^1[3456789]\d{9}$/', $value) or preg_match('/^\w{3,11}$/', $value);
+    return (bool)preg_match('/^1[3456789]\d{9}$/', $value) or preg_match('/^\w{3,11}$/', $value);
 }
 
 /**
@@ -164,7 +164,7 @@ function is_date(string $value): bool
             return false;
         }
     } else {
-        return (boolean)preg_match('/^(?:(?:1[789]\d{2}|2[012]\d{2})[-\/](?:(?:0?2[-\/](?:0?1\d|2[0-8]))|(?:0?[13578]|10|12)[-\/](?:[012]?\d|3[01]))|(?:(?:0?[469]|11)[-\/](?:[012]?\d|30)))|(?:(?:1[789]|2[012])(?:[02468][048]|[13579][26])[-\/](?:0?2[-\/]29))$/', $value);
+        return (bool)preg_match('/^(?:(?:1[789]\d{2}|2[012]\d{2})[-\/](?:(?:0?2[-\/](?:0?1\d|2[0-8]))|(?:0?[13578]|10|12)[-\/](?:[012]?\d|3[01]))|(?:(?:0?[469]|11)[-\/](?:[012]?\d|30)))|(?:(?:1[789]|2[012])(?:[02468][048]|[13579][26])[-\/](?:0?2[-\/]29))$/', $value);
     }
 }
 
@@ -176,7 +176,7 @@ function is_date(string $value): bool
 function is_time(string $value): bool
 {
     if (empty($value)) return false;
-    return (boolean)preg_match('/^([0-1]\d|2[0-3])(\:[0-5]\d){2}$/', $value);
+    return (bool)preg_match('/^([0-1]\d|2[0-3])(\:[0-5]\d){2}$/', $value);
 }
 
 /**
@@ -260,7 +260,7 @@ function is_ip(string $value, string $which = 'ipv4'): bool
 function is_domain(string $value): bool
 {
     if (empty($value)) return false;
-    return (boolean)preg_match('/^(?=^.{3,255}$)([a-z\d][a-z\d\-]{0,62}\.)+[a-z]{2,10}$/i', $value);
+    return (bool)preg_match('/^(?=^.{3,255}$)([a-z\d][a-z\d\-]{0,62}\.)+[a-z]{2,10}$/i', $value);
 }
 
 /**
