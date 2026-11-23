@@ -48,7 +48,6 @@ final class Xml
         if (!$str) return null;
         $xml_parser = xml_parser_create();
         if (!xml_parse($xml_parser, $str, true)) {
-            xml_parser_free($xml_parser);
             return null;
         }
         return json_decode(json_encode(@simplexml_load_string($str, "SimpleXMLElement", LIBXML_NOCDATA)), $toArray);

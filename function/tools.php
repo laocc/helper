@@ -249,7 +249,6 @@ function base64_img(string $base64Code, ?string $fileName = null)
     if (is_null($fileName)) {
         header('Content-Type: image/png');
         imagepng($im);
-        imagedestroy($im);
     } else {
         mk_dir($fileName);
         $ext = strtolower(substr($fileName, -3));
