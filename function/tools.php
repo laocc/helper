@@ -763,6 +763,8 @@ function _echo($text, ?string $bgColor = null, ?string $ftColor = null)
     if (!_CLI) return;
     if (is_array($text)) $text = print_r($text, true);
     $text = trim($text, "\n");
+    if (!$bgColor) $bgColor = 'black';
+    if (!$ftColor) $ftColor = 'white';
     $front = ['green' => 32, 'g' => 32, 'red' => 31, 'r' => 31, 'yellow' => 33, 'y' => 33, 'blue' => 34, 'b' => 34, 'white' => 37, 'w' => 37, 'black' => 30, 'h' => 30];
     $ground = ['green' => 42, 'g' => 42, 'red' => 41, 'r' => 41, 'yellow' => 43, 'y' => 43, 'blue' => 44, 'b' => 44, 'white' => 47, 'w' => 47, 'black' => 40, 'h' => 40];
     $color = '[' . ($ground[$bgColor] ?? 40) . ';' . ($front[$ftColor] ?? 37) . 'm';//默认黑底白字
