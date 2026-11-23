@@ -78,7 +78,7 @@ abstract class Request
      * @param string|null $signStr
      * @return bool|string
      */
-    public function signCheck(array $param = [], string &$signStr = null)
+    public function signCheck(array $param = [], ?string &$signStr = null)
     {
         $sKey = $param['sign_key'] ?? 'sign';
         $tKey = $param['token_key'] ?? 'key';
